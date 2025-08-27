@@ -28,6 +28,7 @@ Nosso objetivo é criar uma ferramenta robusta para a comunidade acadêmica, fac
 - **Backend**: Django
 - **Frontend**: HTML + CSS
 - **Banco de Dados**: SQLite
+- **Agente IA**: Cursor e Gemini
 
 ---
 
