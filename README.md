@@ -1,5 +1,3 @@
-Claro! Aqui está a versão modificada do projeto, atualizada com as informações do novo grupo e os requisitos da biblioteca digital de artigos.
-
 # 📚 Biblioteca Digital de Artigos
 
 Este projeto tem como objetivo desenvolver uma **biblioteca digital** para disponibilizar **acesso fácil e centralizado aos artigos publicados** em determinados eventos científicos. A plataforma será um repositório organizado, permitindo que usuários encontrem e acessem produções acadêmicas de forma eficiente.
