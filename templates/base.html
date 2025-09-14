@@ -3,30 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Digital Library{% endblock %}</title>
+    <title>{% block title %}Biblioteca Digital de Artigos{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* A little extra style to mimic the link hover effect from the DCC site */
+        .nav-link:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
-    <nav class="bg-white shadow-md">
+
+    <!-- Header Section (Blue Bar) -->
+    <header class="bg-[#003366] text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+            <div class="flex items-center justify-between h-24">
+                <!-- Left side: Title -->
                 <div class="flex items-center">
-                    <a href="/" class="font-bold text-xl text-indigo-600">Digital Library</a>
+                    <div class="flex-shrink-0">
+                        <!-- Placeholder for a logo if you add one later -->
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Biblioteca Digital de Artigos</h1>
+                        <p class="text-sm text-blue-200">Departamento de Ciência da Computação - UFMG</p>
+                    </div>
                 </div>
+
+                <!-- Right side: Login/Signup Buttons -->
                 <div class="flex items-center">
-                    <!-- Placeholder for Login/Signup Buttons -->
-                    <a href="#" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition duration-300">Login</a>
+                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition duration-300">Login</a>
                     <a href="#" class="ml-4 bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition duration-300">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Bar (Light Gray) -->
+    <nav class="bg-gray-100 border-b-2 border-t-2 border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-start h-12">
+                <div class="flex items-baseline space-x-4">
+                    <!-- Placeholder navigation links -->
+                    <a href="/" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Página Inicial</a>
+                    <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Eventos</a>
+                    <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Autores</a>
+                    <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Busca Avançada</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {% block content %}
-        <!-- Content from other pages will be injected here -->
-        {% endblock %}
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
+        <div class="bg-white p-8 rounded-lg shadow-md min-h-[60vh]">
+            {% block content %}
+            <!-- Content from other pages will be injected here -->
+            {% endblock %}
+        </div>
     </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-800 text-gray-300 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h3 class="text-lg font-semibold text-white">Sobre</h3>
+                <p class="mt-2 text-sm">
+                    Este projeto é uma biblioteca digital para artigos científicos, desenvolvido como parte da disciplina de Engenharia de Software.
+                </p>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-white">Links Úteis</h3>
+                <ul class="mt-2 space-y-1 text-sm">
+                    <li><a href="https://dcc.ufmg.br" target="_blank" class="hover:text-white">DCC/UFMG</a></li>
+                    <li><a href="https://ufmg.br" target="_blank" class="hover:text-white">UFMG</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-white">Contato</h3>
+                <p class="mt-2 text-sm">
+                    Av. Antônio Carlos, 6627, Pampulha<br>
+                    Belo Horizonte, MG, Brasil
+                </p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 border-t border-gray-700 pt-4 text-center text-sm">
+            <p>&copy; 2025 Departamento de Ciência da Computação, UFMG</p>
+        </div>
+    </footer>
 
 </body>
 </html>
+
+
