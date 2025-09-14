@@ -19,20 +19,15 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-24">
                 <!-- Left side: Title -->
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <!-- Placeholder for a logo if you add one later -->
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold">Biblioteca Digital de Artigos</h1>
-                        <p class="text-sm text-blue-200">Departamento de Ciência da Computação - UFMG</p>
-                    </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Biblioteca Digital de Artigos</h1>
+                    <p class="text-sm text-blue-200">Departamento de Ciência da Computação - UFMG</p>
                 </div>
 
-                <!-- Right side: Login/Signup Buttons -->
+                <!-- Right side: Login/Signup Buttons with Correct URLs -->
                 <div class="flex items-center">
-                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition duration-300">Login</a>
-                    <a href="#" class="ml-4 bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition duration-300">Sign Up</a>
+                    <a href="{% url 'users:login' %}" class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition duration-300">Login</a>
+                    <a href="{% url 'users:signup' %}" class="ml-4 bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition duration-300">Sign Up</a>
                 </div>
             </div>
         </div>
@@ -44,7 +39,7 @@
             <div class="flex items-center justify-start h-12">
                 <div class="flex items-baseline space-x-4">
                     <!-- Placeholder navigation links -->
-                    <a href="/" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Página Inicial</a>
+                    <a href="{% url 'index' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Página Inicial</a>
                     <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Eventos</a>
                     <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Autores</a>
                     <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Busca Avançada</a>
@@ -87,7 +82,7 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 border-t border-gray-700 pt-4 text-center text-sm">
-            <p>&copy; 2025 Departamento de Ciência da Computação, UFMG</p>
+            <p>&copy; 2025 Departamento de Ciência da Computação, UFMG.</p>
         </div>
     </footer>
 
