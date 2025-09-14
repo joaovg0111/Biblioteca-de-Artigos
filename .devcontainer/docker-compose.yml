@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # Your Django application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mount your local workspace into the container.
+      # The target path should match the "workspaceFolder" in your devcontainer.json.
+      - ..:/home/se/workspace:cached
+    
+    # Expose ports. This should correspond to "forwardPorts" in devcontainer.json.
+    ports:
+      - "8000:8000"
+      
+    # These settings are often useful for debugging with tools like gdb.
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp=unconfined
+      
+    # Keep the container running so VS Code can attach to it.
+    command: sleep infinity
