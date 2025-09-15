@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     "apps.users",
+    "apps.events",
 ]
 
 MIDDLEWARE = [
@@ -45,6 +46,7 @@ TEMPLATES = [
         'DIRS': [BASE_DIR / 'templates',
                  BASE_DIR / 'templates' / 'home',
                  BASE_DIR / 'templates' / 'admin',
+                 BASE_DIR / 'templates' / 'events',
                  BASE_DIR / 'templates' / 'registration'],
         'APP_DIRS': True,
         'OPTIONS': {

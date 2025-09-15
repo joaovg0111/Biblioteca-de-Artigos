@@ -19,17 +19,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-24">
                 <!-- Left side: Title -->
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <!-- Placeholder for a logo if you add one later -->
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold">Biblioteca Digital de Artigos</h1>
-                        <p class="text-sm text-blue-200">Departamento de Ciência da Computação - UFMG</p>
-                    </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Biblioteca Digital de Artigos</h1>
+                    <p class="text-sm text-blue-200">Departamento de Ciência da Computação - UFMG</p>
                 </div>
 
-                <!-- Right side: Login/Signup Buttons -->
+                <!-- Right side: Login/Signup/Logout Buttons -->
                 <div class="flex items-center">
                     {% if user.is_authenticated %}
                         <span class="text-sm mr-4">Olá, {{ user.first_name|default:user.username }}!</span>
@@ -48,9 +43,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-start h-12">
                 <div class="flex items-baseline space-x-4">
-                    <!-- Placeholder navigation links -->
-                    <a href="/" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Página Inicial</a>
-                    <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Eventos</a>
+                    <a href="{% url 'index' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Página Inicial</a>
+                    
+                    <!-- ESTA É A LINHA MODIFICADA -->
+                    <a href="{% url 'events:event-list' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Eventos</a>
+                    
                     <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Autores</a>
                     <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Busca Avançada</a>
                 </div>
@@ -60,28 +57,16 @@
 
     <!-- Main Content Area -->
     <main class="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
-        
-        <!-- ================================================================== -->
-        <!-- == THIS IS THE NEW MESSAGES BLOCK                               == -->
-        <!-- ================================================================== -->
         {% if messages %}
             <div class="mb-6 space-y-2">
                 {% for message in messages %}
                     <div class="p-4 rounded-md {% if message.tags == 'success' %}bg-green-100 border border-green-400 text-green-700{% elif message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700{% else %}bg-blue-100 border border-blue-400 text-blue-700{% endif %}" role="alert">
-                        <p class="font-bold">
-                            {% if message.tags == 'success' %}Sucesso!
-                            {% elif message.tags == 'error' %}Erro!
-                            {% else %}Aviso{% endif %}
-                        </p>
+                        <p class="font-bold">{% if message.tags == 'success' %}Sucesso!{% elif message.tags == 'error' %}Erro!{% else %}Aviso{% endif %}</p>
                         <p>{{ message }}</p>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
-        <!-- ================================================================== -->
-        <!-- == END OF MESSAGES BLOCK                                        == -->
-        <!-- ================================================================== -->
-
         <div class="bg-white p-8 rounded-lg shadow-md min-h-[60vh]">
             {% block content %}
             <!-- Content from other pages will be injected here -->
@@ -89,7 +74,7 @@
         </div>
     </main>
 
-    <!-- Footer Section (Unchanged) -->
+    <!-- Footer Section -->
     <footer class="bg-gray-800 text-gray-300 mt-12 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -114,7 +99,7 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 border-t border-gray-700 pt-4 text-center text-sm">
-            <p>&copy; 2_025 Departamento de Ciência da Computação, UFMG</p>
+            <p>&copy; 2025 Departamento de Ciência da Computação, UFMG</p>
         </div>
     </footer>
 
