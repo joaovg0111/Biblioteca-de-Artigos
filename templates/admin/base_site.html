@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block branding %}
+<div>
+    <h1 id="site-name">
+        <a href="{% url 'admin:index' %}">Administração da Biblioteca Digital</a>
+    </h1>
+    <p style="padding-left: 4px; color: #f0f0f0; font-size: 0.8rem;">
+        Departamento de Ciência da Computação - UFMG
+    </p>
+</div>
+{% endblock %}
+
+
+{% block extrastyle %}
+    {# Carrega primeiro o CSS original da administração para não quebrar nada #}
+    {{ block.super }}
+    
+    {# Adiciona o link para a nossa folha de estilo personalizada #}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom.css' %}">
+{% endblock %}

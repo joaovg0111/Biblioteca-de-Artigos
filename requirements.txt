@@ -1,0 +1,23 @@
+# --- Core web framework ---
+Django>=5.0,<6.0
+
+# --- Helpful dev utilities (shell_plus, runserver_plus, etc.) ---
+django-extensions>=3.2
+
+# --- Filtering for search UIs (title, author, event) ---
+django-filter>=24.2
+
+# --- Environment variables (keep secrets/config out of settings.py) ---
+django-environ>=0.11
+
+# --- Static files in container/simple deploys (serves static files efficiently) ---
+whitenoise>=6.7
+
+# --- File uploads / images (thumbnails, covers, etc.) ---
+Pillow>=10.3
+
+# --- Bulk import of articles from BibTeX ---
+bibtexparser>=1.4.0
+
+# --- Optional: PDF generation (for export/print views of article pages) ---
+WeasyPrint>=61.0
