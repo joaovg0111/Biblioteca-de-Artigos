@@ -6,19 +6,30 @@
 <div class="max-w-md mx-auto">
     <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Entrar na sua Conta</h1>
     
-    <form action="" method="post" class="space-y-6">
+    <form action="{% url 'users:login' %}" method="post" class="space-y-4">
         {% csrf_token %}
-        <!-- Security token required by Django -->
+        
+        <!-- This block will display the main error message if login fails -->
+        {% if form.non_field_errors %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md" role="alert">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-        <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="email" id="email" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        </div>
-
-        <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
-            <input type="password" name="password" id="password" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        </div>
+        <!-- Django will render the Email and Password fields from your form here -->
+        {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                <!-- This renders the input field with its default widget -->
+                {{ field }}
+                <!-- This displays any errors specific to this field -->
+                {% for error in field.errors %}
+                    <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
 
         <div class="flex items-center justify-between">
             <div class="text-sm">
@@ -42,4 +53,16 @@
         </a>
     </p>
 </div>
+
+<!-- Simple script to add Tailwind classes to the Django-rendered form inputs -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const formInputs = document.querySelectorAll('form input[type="text"], form input[type="email"], form input[type="password"]');
+        formInputs.forEach(input => {
+            if (!input.hasAttribute('class')) {
+                 input.className = 'mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm';
+            }
+        });
+    });
+</script>
 {% endblock %}

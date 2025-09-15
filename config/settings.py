@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    "apps.users",
 ]
 
 MIDDLEWARE = [
@@ -79,6 +81,13 @@ DATABASES = {
     }
 }
 
+# THIS IS THE NEW SETTING THAT TELLS DJANGO TO USE YOUR CUSTOM BACKEND
+AUTHENTICATION_BACKENDS = [
+    # 1. First, try to authenticate using our custom email backend.
+    'apps.users.backends.EmailBackend',
+    # 2. If that fails, fall back to the default username-based backend.
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -102,12 +111,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
-
 USE_TZ = True
 
 
