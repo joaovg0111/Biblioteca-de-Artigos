@@ -22,7 +22,10 @@ def signup_view(request):
                 interests=request.POST.get('interests', ''),
                 biography=request.POST.get('biography', '')
             )
-            login(request, user)
+            # ESTA É A CORREÇÃO CRÍTICA:
+            # Especificamos explicitamente qual backend usar para a sessão de login,
+            # resolvendo a ambiguidade para o Django.
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f"Cadastro realizado com sucesso! Bem-vindo(a), {user.first_name}!")
             return redirect('index')
     else:

@@ -1,0 +1,2 @@
+python manage.py createsuperuser
+luis123
