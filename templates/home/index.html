@@ -1,15 +1,25 @@
-{% extends "../base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Home - Digital Library{% endblock %}
 
 {% block content %}
 <div class="bg-white p-8 rounded-lg shadow-md">
-    <h1 class="text-4xl font-bold mb-4">Welcome to the Digital Library</h1>
-    <p class="text-lg text-gray-600">
-        Your central hub for scientific articles from top events.
-    </p>
-    <p class="mt-4">
-        Please log in or sign up to access all features.
-    </p>
+    {% if user.is_authenticated %}
+        <h1 class="text-4xl font-bold mb-4">Bem-vindo(a) de volta, {{ user.first_name|default:user.username }}!</h1>
+        <p class="text-lg text-gray-600">
+            Explore os artigos ou contribua com um novo.
+        </p>
+        <div class="mt-6">
+            <a href="{% url 'articles:article-upload' %}" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700">
+                Fazer Upload de Artigo
+            </a>
+        </div>
+    {% else %}
+        <h1 class="text-4xl font-bold mb-4">Bem-vindo(a) à Biblioteca Digital</h1>
+        <p class="text-lg text-gray-600">
+            Seu hub central para artigos científicos dos principais eventos.
+        </p>
+        <p class="mt-4">Por favor, <a href="{% url 'users:login' %}" class="text-blue-600 hover:underline">faça login</a> ou <a href="{% url 'users:signup' %}" class="text-blue-600 hover:underline">crie uma conta</a> para acessar todas as funcionalidades.</p>
+    {% endif %}
 </div>
 {% endblock %}

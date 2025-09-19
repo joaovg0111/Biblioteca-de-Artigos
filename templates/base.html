@@ -41,15 +41,25 @@
     <!-- Navigation Bar (Light Gray) -->
     <nav class="bg-gray-100 border-b-2 border-t-2 border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-start h-12">
+            <div class="flex items-center justify-between h-16">
+                <!-- Left side: Navigation Links -->
                 <div class="flex items-baseline space-x-4">
                     <a href="{% url 'index' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Página Inicial</a>
-                    
-                    <!-- ESTA É A LINHA MODIFICADA -->
                     <a href="{% url 'events:event-list' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Eventos</a>
-                    
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'articles:article-upload' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Adicionar Artigo</a>
+                    {% endif %}
                     <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Autores</a>
-                    <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Busca Avançada</a>
+                </div>
+
+                <!-- Right side: Search Bar -->
+                <div>
+                    <form action="{% url 'articles:article-search' %}" method="get" class="flex items-center">
+                        <input type="search" name="q" placeholder="Buscar artigos..." class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <button type="submit" class="ml-2 px-4 py-2 bg-[#003366] text-white rounded-md text-sm font-medium hover:bg-[#002244] transition duration-300">
+                            Buscar
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

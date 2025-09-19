@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Upload de Artigo{% endblock %}
+
+{% block content %}
+<div class="container mx-auto mt-8">
+    <div class="max-w-2xl mx-auto bg-white p-8 border border-gray-200 rounded-lg shadow-sm">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Fazer Upload de Novo Artigo</h1>
+
+        {# O atributo enctype="multipart/form-data" é obrigatório na tag form para upload de arquivos. #}
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            
+            {# Renderiza os campos do formulário. (Pode-se usar as_p, as_table, etc. para estilização futura.) #}
+            {{ form.as_p }}
+
+            <div class="mt-8">
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    Fazer Upload
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
