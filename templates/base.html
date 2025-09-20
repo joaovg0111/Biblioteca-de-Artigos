@@ -46,8 +46,9 @@
                 <div class="flex items-baseline space-x-4">
                     <a href="{% url 'index' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Página Inicial</a>
                     <a href="{% url 'events:event-list' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Eventos</a>
-                    {% if user.is_authenticated %}
+                    {% if user.is_authenticated and user.is_staff %}
                     <a href="{% url 'articles:article-upload' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Adicionar Artigo</a>
+                    <a href="{% url 'articles:my-articles' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Meus Artigos</a>
                     {% endif %}
                     <a href="#" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition duration-300">Autores</a>
                 </div>

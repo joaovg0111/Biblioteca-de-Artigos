@@ -3,8 +3,7 @@ from .models import Article
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'edition', 'authors', 'created_at')
-    list_filter = ('edition__event', 'edition__start_date')
+    list_display = ('title', 'authors', 'created_at')
+    list_filter = ('created_at',)
     search_fields = ('title', 'authors', 'abstract')
-    autocomplete_fields = ['edition']
     date_hierarchy = 'created_at'
