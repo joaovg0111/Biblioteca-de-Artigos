@@ -1,10 +1,11 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block branding %}
 <div>
     <h1 id="site-name">
-        <a href="{% url 'admin:index' %}">Administração da Biblioteca Digital</a>
+        <a href="{% url 'index' %}">Biblioteca Digital de Artigos</a>
     </h1>
     <p style="padding-left: 4px; color: #f0f0f0; font-size: 0.8rem;">
         Departamento de Ciência da Computação - UFMG
@@ -12,6 +13,18 @@
 </div>
 {% endblock %}
 
+{% block userlinks %}
+    {% if user.is_active and user.is_staff %}
+        {% url 'django-admindocs-docroot' as docsroot %}
+        {% if docsroot %}
+            <a href="{{ docsroot }}">{% translate 'Documentation' %}</a> /
+        {% endif %}
+    {% endif %}
+    {% if user.has_usable_password %}
+        <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+    {% endif %}
+    <a href="{% url 'admin:logout' %}">{% translate 'Log out' %}</a>
+{% endblock %}
 
 {% block extrastyle %}
     {# Carrega primeiro o CSS original da administração para não quebrar nada #}

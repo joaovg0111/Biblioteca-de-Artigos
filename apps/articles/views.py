@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from apps.events.models import Event
 from .forms import ArticleForm, BibtexUploadForm
 from .models import Article
 from django.db.models import Q
@@ -11,81 +13,61 @@ import bibtexparser
 from bibtexparser.bparser import BibTexParser
 import os
 
-@staff_member_required
-def article_upload_view(request):
+def home_view(request):
     """
-    Exibe o formulário de upload de artigos e processa os dados submetidos.
-    Apenas para administradores (staff).
+    Exibe a página inicial, incluindo uma lista dos 5 artigos mais recentes.
     """
-    if request.method == 'POST':
-        # Passa request.FILES para lidar com os dados do arquivo.
-        form = ArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            article = form.save(commit=False)
-            article.submitter = request.user
-            # Se um arquivo foi enviado, armazena seu nome original
-            if 'pdf_file' in request.FILES:
-                article.original_filename = request.FILES['pdf_file'].name
-            article.save()
-            form.save_m2m() # Necessário para relações ManyToMany, boa prática manter.
-            messages.success(request, "Artigo enviado com sucesso.")
-            return redirect('index') # Redireciona para a página inicial após o upload
-    else:
-        form = ArticleForm()
-    return render(request, 'articles/article_form.html', {'form': form})
+    recent_articles = Article.objects.order_by('-created_at')[:3]
+    recent_events = Event.objects.order_by('-id')[:4]  # Pega os 4 eventos mais recentes
+    context = {
+        'recent_articles': recent_articles,
+        'recent_events': recent_events,
+    }
+    return render(request, 'home/index.html', context)
+
+def add_article_options_view(request):
+    """
+    Exibe uma página para administradores escolherem como adicionar artigos:
+    individualmente ou em massa via BibTeX.
+    """
+    return render(request, 'articles/add_article_options.html')
+
+def article_list_view(request):
+    """
+    Exibe uma lista paginada de todos os artigos.
+    """
+    article_list = Article.objects.order_by('-created_at')
+    paginator = Paginator(article_list, 10)  # Mostra 10 artigos por página
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+    }
+    return render(request, 'articles/article_list.html', context)
 
 def article_search_view(request):
     """
     Busca artigos com base em uma consulta do usuário.
     A busca é feita nos campos de título, autores e resumo.
     """
-    query = request.GET.get('q')
-    results = []
-    if query:
-        # Usando Q objects para criar uma consulta OR complexa
+    query = request.GET.get('q', '').strip()
+    results = Article.objects.none()  # Começa com um QuerySet vazio
+
+    if not query:
+        # Nenhuma consulta, não faz nada
+        pass
+    elif len(query) < 2:
+        messages.warning(request, "O termo de busca deve ter pelo menos 2 caracteres.")
+    else:
         results = Article.objects.filter(
             Q(title__icontains=query) |
             Q(authors__icontains=query) |
             Q(abstract__icontains=query)
         ).distinct()
-
     context = {'query': query, 'results': results}
     return render(request, 'articles/article_search_results.html', context)
-
-@staff_member_required
-def bulk_article_upload_view(request):
-    """
-    Processa o upload de um arquivo BibTeX para criar múltiplos artigos em massa.
-    Apenas para administradores (staff).
-    """
-    if request.method == 'POST':
-        form = BibtexUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            bibtex_file = form.cleaned_data['bibtex_file']
-
-            try:
-                # O arquivo precisa ser decodificado para string
-                bibtex_str = bibtex_file.read().decode('utf-8')
-                parser = BibTexParser(common_strings=True)
-                bib_database = bibtexparser.loads(bibtex_str, parser=parser)
-
-                created_count = 0
-                for entry in bib_database.entries:
-                    Article.objects.create(
-                        submitter=request.user,
-                        title=entry.get('title', 'Título não especificado'),
-                        authors=entry.get('author', 'Autores não especificados'),
-                        abstract=entry.get('abstract', '')
-                    )
-                    created_count += 1
-                messages.success(request, f"{created_count} artigos foram importados com sucesso.")
-                return redirect('index')
-            except Exception as e:
-                messages.error(request, f"Ocorreu um erro ao processar o arquivo BibTeX: {e}")
-    else:
-        form = BibtexUploadForm()
-    
-    return render(request, 'articles/bulk_article_upload.html', {'form': form})
 
 def download_pdf_view(request, article_id):
     """

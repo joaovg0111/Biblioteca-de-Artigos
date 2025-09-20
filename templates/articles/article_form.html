@@ -11,12 +11,7 @@
         </div>
         {% endif %}
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">{% if is_editing %}Editar Artigo{% else %}Adicionar Novo Artigo (Individual){% endif %}</h1>
-            {% if not is_editing %}
-                <a href="{% url 'articles:bulk-article-upload' %}" class="text-sm font-medium text-green-600 hover:text-green-800 transition-colors">
-                    → Mudar para Importação em Massa (BibTeX)
-                </a>
-            {% endif %}
+            <h1 class="text-2xl font-bold text-gray-800">{% if is_editing %}Editar Artigo{% else %}Adicionar Novo Artigo{% endif %}</h1>
         </div>
 
         {# O atributo enctype="multipart/form-data" é obrigatório na tag form para upload de arquivos. #}

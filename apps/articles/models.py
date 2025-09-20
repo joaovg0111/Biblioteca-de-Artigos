@@ -25,6 +25,10 @@ class Article(models.Model):
     original_filename = models.CharField("Nome Original do Arquivo", max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Artigo"
+        verbose_name_plural = "Artigos"
+
     def __str__(self):
         return self.title
 
