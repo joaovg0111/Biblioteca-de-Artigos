@@ -35,3 +35,14 @@ class Edition(models.Model):
 
     def __str__(self):
         return f"{self.event.acronym} {self.year} ({self.location})"
+
+class Author(models.Model):
+    name = models.CharField("Nome", max_length=255, unique=True)
+    
+    class Meta:
+        verbose_name = "Autor"
+        verbose_name_plural = "Autores"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
