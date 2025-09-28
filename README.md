@@ -19,7 +19,7 @@ Nosso objetivo é criar uma ferramenta robusta para a comunidade acadêmica, fac
 | Joao Vitor Gomes Mapa da Silva | 2019027695 | Fullstack |
 | Luis Henrique Ribeiro Maciel | 2021020759 - | Fullstack |
 | Seungbin Han | 2025550850 - | Fullstack |
-| Leonardo Bhering Damasceno | 2025550850 - | Fullstack |
+| Leonardo Bhering Damasceno | 2020006728 - | Fullstack |
 
 ---
 
