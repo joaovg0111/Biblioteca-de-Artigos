@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.name }}{% endblock %}
+
+{% block content %}
+  <h1 class="text-3xl font-bold text-[#003366]">{{ event.name }} ({{ event.acronym }})</h1>
+  
+  <div class="mt-4 text-gray-700 prose max-w-none">
+    {{ event.full_description|linebreaks }}
+  </div>
+
+  <h2 class="text-2xl font-semibold mt-8 border-b pb-2">Edições do Evento</h2>
+  <ul class="mt-4 list-disc list-inside space-y-2">
+    {% for edition in editions %}
+      <li>
+        <a href="{% url 'events:edition-detail' event_acronym=event.acronym edition_id=edition.id %}" class="text-blue-600 hover:underline">
+          {{ edition }}
+        </a>
+      </li>
+    {% empty %}
+      <li class="text-gray-500">Nenhuma edição cadastrada para este evento.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

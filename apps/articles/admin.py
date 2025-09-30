@@ -7,16 +7,15 @@ from django.contrib import messages
 from .forms import BibtexUploadForm
 from .models import Article
 # --- MUDANÇA 1: Importe os modelos que vamos precisar ---
-from apps.events.models import Author, Edition
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    # --- MUDANÇA 2: Corrigido o list_display e melhorado os filtros e busca ---
-    list_display = ('title', 'display_authors', 'edition', 'created_at')
-    list_filter = ('edition__event', 'edition', 'authors')
-    search_fields = ('title', 'authors__name', 'abstract')
+    # Apenas os campos que existem no modelo agora
+    list_display = ('title', 'authors', 'edition', 'created_at')
+    list_filter = ('edition', 'created_at',)
+    search_fields = ('title', 'authors', 'abstract')
     date_hierarchy = 'created_at'
     
     # --- MUDANÇA 3: A nova função para exibir os autores ---

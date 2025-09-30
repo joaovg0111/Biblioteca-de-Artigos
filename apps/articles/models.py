@@ -1,11 +1,13 @@
+# Em apps/articles/models.py
+
 from django.db import models
 from django.conf import settings
 from datetime import datetime
 import os
 import uuid
 
-# --- IMPORTAÇÃO ADICIONADA ---
-from apps.events.models import Edition, Author 
+# --- IMPORTAMOS APENAS O 'Edition' AGORA ---
+from apps.events.models import Edition
 
 def article_upload_path(instance, filename):
     ext = os.path.splitext(filename)[1]
@@ -16,10 +18,10 @@ class Article(models.Model):
     submitter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Enviado por")
     title = models.CharField("Título", max_length=255)
     
-    # --- MUDANÇA 1: De CharField para uma relação Muitos-para-Muitos ---
-    authors = models.ManyToManyField(Author, verbose_name="Autores", related_name="articles")
+    # --- MUDANÇA: Voltamos para o campo de texto simples ---
+    authors = models.CharField("Autores", max_length=500)
     
-    # --- MUDANÇA 2: Adicionada a relação de Chave Estrangeira com Edition ---
+    # --- MANTEMOS A CONEXÃO COM A EDIÇÃO ---
     edition = models.ForeignKey(Edition, on_delete=models.CASCADE, verbose_name="Edição", related_name="articles", null=True, blank=True)
 
     abstract = models.TextField("Resumo", blank=True)
@@ -34,20 +36,4 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        # Se o objeto já existe no banco de dados, verifica se o arquivo foi alterado.
-        if self.pk:
-            try:
-                old_instance = Article.objects.get(pk=self.pk)
-                # Se o arquivo antigo existe e é diferente do novo, apaga o antigo.
-                if old_instance.pdf_file and old_instance.pdf_file != self.pdf_file:
-                    old_instance.pdf_file.delete(save=False)
-            except Article.DoesNotExist:
-                pass  # O objeto é novo, não faz nada.
-        super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        # Antes de deletar o objeto do banco de dados, apaga o arquivo associado.
-        if self.pdf_file:
-            self.pdf_file.delete(save=False)
-        super().delete(*args, **kwargs)
+    # O resto do seu código (save e delete) pode continuar aqui
