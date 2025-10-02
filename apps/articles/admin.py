@@ -1,19 +1,29 @@
+# Em apps/articles/admin.py
+
 from django.contrib import admin
 from django.urls import path
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import BibtexUploadForm
 from .models import Article
+# --- MUDANÇA 1: Importe os modelos que vamos precisar ---
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'authors', 'created_at')
-    list_filter = ('created_at',)
+    # Apenas os campos que existem no modelo agora
+    list_display = ('title', 'authors', 'edition', 'created_at')
+    list_filter = ('edition', 'created_at',)
     search_fields = ('title', 'authors', 'abstract')
     date_hierarchy = 'created_at'
     
+    # --- MUDANÇA 3: A nova função para exibir os autores ---
+    def display_authors(self, obj):
+        """Cria uma string com os nomes dos autores para exibir no admin."""
+        return ", ".join([author.name for author in obj.authors.all()])
+    display_authors.short_description = 'Autores'
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -26,6 +36,9 @@ class ArticleAdmin(admin.ModelAdmin):
         Processa o upload de um arquivo BibTeX para criar múltiplos artigos em massa
         dentro da interface de administração.
         """
+        # AVISO: Esta função de bulk upload precisará ser adaptada no futuro
+        # para lidar com a criação ou busca de Autores e Edições.
+        # Por enquanto, vamos deixá-la como está para não quebrar.
         if request.method == 'POST':
             form = BibtexUploadForm(request.POST, request.FILES)
             if form.is_valid():
@@ -36,17 +49,17 @@ class ArticleAdmin(admin.ModelAdmin):
                     bib_database = bibtexparser.loads(bibtex_str, parser=parser)
 
                     created_count = 0
+                    # Esta parte vai dar erro porque 'authors' agora é um ManyToManyField
+                    # e 'edition' é um campo obrigatório.
+                    # É necessário adaptar esta lógica depois que as migrações funcionarem.
                     for entry in bib_database.entries:
-                        Article.objects.create(
-                            submitter=request.user,
-                            title=entry.get('title', 'Título não especificado'),
-                            authors=entry.get('author', 'Autores não especificados'),
-                            abstract=entry.get('abstract', '')
-                        )
-                        created_count += 1
+                        # Artigo de exemplo para evitar que o sistema quebre AGORA
+                        # self.message_user(request, "FUNCIONALIDADE DE BULK UPLOAD DESATIVADA TEMPORARIAMENTE.", messages.WARNING)
+                        pass
                     
-                    self.message_user(request, f"{created_count} artigos foram importados com sucesso.", messages.SUCCESS)
+                    self.message_user(request, f"ATENÇÃO: A importação em massa precisa ser atualizada para o novo modelo de dados.", messages.WARNING)
                     return redirect('admin:articles_article_changelist')
+
                 except Exception as e:
                     self.message_user(request, f"Ocorreu um erro ao processar o arquivo BibTeX: {e}", messages.ERROR)
         else:

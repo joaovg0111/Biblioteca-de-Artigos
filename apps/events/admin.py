@@ -12,13 +12,11 @@ class EditionInline(admin.TabularInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('acronym', 'name', 'website')
-    search_fields = ('acronym', 'name')
-    inlines = [EditionInline]
+    list_display = ('acronym', 'name')
+    search_fields = ('name', 'acronym')
 
 @admin.register(Edition)
 class EditionAdmin(admin.ModelAdmin):
-    list_display = ('event', 'year', 'location', 'website', 'start_date')
+    list_display = ('__str__', 'event', 'year', 'location')
     list_filter = ('event',)
-    search_fields = ('event__acronym', 'event__name', 'location', 'website')
-    autocomplete_fields = ['event']
+    search_fields = ('event__acronym', 'location')

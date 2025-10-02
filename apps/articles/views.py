@@ -48,25 +48,21 @@ def article_list_view(request):
     return render(request, 'articles/article_list.html', context)
 
 def article_search_view(request):
-    """
-    Busca artigos com base em uma consulta do usuário.
-    A busca é feita nos campos de título, autores e resumo.
-    """
-    query = request.GET.get('q', '').strip()
-    results = Article.objects.none()  # Começa com um QuerySet vazio
+    query = request.GET.get('q')
+    articles = Article.objects.none()
 
-    if not query:
-        # Nenhuma consulta, não faz nada
-        pass
-    elif len(query) < 2:
-        messages.warning(request, "O termo de busca deve ter pelo menos 2 caracteres.")
-    else:
-        results = Article.objects.filter(
+    if query:
+        articles = Article.objects.filter(
             Q(title__icontains=query) |
-            Q(authors__icontains=query) |
-            Q(abstract__icontains=query)
+            Q(authors__icontains=query) |  # <-- Buscando em um campo de texto
+            Q(edition__event__name__icontains=query) |
+            Q(edition__event__acronym__iexact=query)
         ).distinct()
-    context = {'query': query, 'results': results}
+
+    context = {
+        'query': query,
+        'articles': articles
+    }
     return render(request, 'articles/article_search_results.html', context)
 
 def download_pdf_view(request, article_id):
@@ -133,3 +129,14 @@ def article_delete_view(request, article_id):
         messages.success(request, "Artigo excluído com sucesso.")
         return redirect('articles:my-articles')
     return render(request, 'articles/article_confirm_delete.html', {'article': article})
+
+def article_detail_view(request, article_id):
+    """
+    Esta view busca um único artigo pelo seu ID e o exibe em uma página de detalhes.
+    """
+    # Busca o artigo pelo ID ou retorna um erro 404 (Página não encontrada)
+    article = get_object_or_404(Article, pk=article_id)
+    context = {
+        'article': article
+    }
+    return render(request, 'articles/article_detail.html', context)
