@@ -1,0 +1,61 @@
+<!-- COPIE E COLE O CONTEÚDO COMPLETO PARA: templates/admin/articles/bulk_upload.html -->
+
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+    .form-row {
+        padding: 10px;
+        font-size: 13px;
+    }
+    .submit-row {
+        padding: 10px;
+        background: #f8f8f8;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:articles_article_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<div id="content-main">
+    <!-- MUDANÇA: A tag <h1> que estava aqui foi REMOVIDA para corrigir a duplicação -->
+
+    <p class="mb-4">
+        Selecione um arquivo <code>.bib</code> para importar múltiplos artigos. O sistema tentará encontrar ou criar os eventos e edições correspondentes com base nos campos <code>journal</code>, <code>booktitle</code> e <code>year</code> do arquivo BibTeX.
+    </p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            <div class="form-row">
+                {{ form.bibtex_file.label_tag }}
+                {{ form.bibtex_file }}
+                {% if form.bibtex_file.errors %}
+                    <div class="errors">{{ form.bibtex_file.errors }}</div>
+                {% endif %}
+            </div>
+        </fieldset>
+
+        <div class="submit-row">
+            <input type="submit" value="Importar Artigos" class="default">
+        </div>
+    </form>
+</div>
+{% endblock %}

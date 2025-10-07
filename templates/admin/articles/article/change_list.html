@@ -1,0 +1,19 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %} {# <-- MUDANÇA: Adicionamos 'admin_urls' que estava faltando #}
+
+{% block object-tools-items %}
+    {# 1. Nosso botão personalizado para importação em massa #}
+    <li>
+        <a href="{% url 'admin:articles_article_bulk_upload' %}" class="addlink">
+            {% trans 'Importar em Massa (BibTeX)' %}
+        </a>
+    </li>
+
+    {# 2. O botão padrão "Adicionar artigo", agora com a importação correta #}
+    <li>
+        {% url opts|admin_urlname:'add' as add_url %}
+        <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink">
+            {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
+        </a>
+    </li>
+{% endblock %}

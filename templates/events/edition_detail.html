@@ -1,25 +1,36 @@
 {% extends "base.html" %}
 
-{% block title %}{{ edition }}{% endblock %}
+{% block title %}Artigos de {{ edition }}{% endblock %}
 
 {% block content %}
-  <h1 class="text-3xl font-bold text-[#003366]">{{ edition }}</h1>
-  <p class="text-md text-gray-500">Local: {{ edition.location }}</p>
+{# Cabeçalho da Página com detalhes da edição e link de volta para o evento #}
+<div class="border-b pb-4 mb-6">
+    <p class="text-sm text-gray-500">
+        <a href="{% url 'events:event-detail' edition.event.id %}" class="hover:underline">&larr; Voltar para {{ edition.event.name }}</a>
+    </p>
+    <h1 class="text-4xl font-bold text-gray-800 mt-2">Edição de {{ edition.year }}</h1>
+    <p class="text-lg text-gray-600 mt-2"><strong>Local:</strong> {{ edition.location }}</p>
+    <p class="text-gray-600"><strong>Período:</strong> de {{ edition.start_date|date:"d/m/Y" }} até {{ edition.end_date|date:"d/m/Y" }}</p>
+</div>
 
-  <h2 class="text-2xl font-semibold mt-8 border-b pb-2">Artigos Publicados</h2>
-  <div class="mt-4 space-y-6">
-    {% for article in articles %}
-      <div class="border-b border-gray-200 pb-4">
-        <a href="{% url 'articles:article-detail' article.id %}" class="hover:underline">{{ article.title }}</a>
-        <p class="mt-1 text-sm text-gray-600">
-          <strong>Autores:</strong>
-          {% for author in article.authors.all %}
-            {{ author.name }}{% if not forloop.last %}, {% endif %}
-          {% endfor %}
-        </p>
-      </div>
-    {% empty %}
-      <p class="text-gray-500">Nenhum artigo cadastrado para esta edição.</p>
-    {% endfor %}
-  </div>
+<h2 class="text-2xl font-bold text-gray-700 mb-4">Artigos Publicados Nesta Edição</h2>
+
+{# Lista de Artigos #}
+<div class="space-y-6">
+{% for article in articles %}
+    <div class="border-b border-gray-200 pb-4">
+        <a href="{% url 'articles:article-detail' article.id %}" class="text-xl text-blue-700 hover:underline">{{ article.title }}</a>
+        <div class="mt-1 text-sm text-gray-600">
+            <p>
+                <strong>Autores:</strong>
+                {# CORREÇÃO: Exibimos 'article.authors' diretamente, pois é um campo de texto #}
+                {{ article.authors }}
+            </p>
+        </div>
+    </div>
+{% empty %}
+    <p class="text-gray-500 mt-4">Nenhum artigo foi encontrado para esta edição.</p>
+{% endfor %}
+</div>
+
 {% endblock %}

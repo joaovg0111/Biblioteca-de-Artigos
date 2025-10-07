@@ -1,28 +1,23 @@
-# Em apps/articles/admin.py
+# COPIE E COLE O CONTEÚDO COMPLETO PARA: apps/articles/admin.py
 
 from django.contrib import admin
 from django.urls import path
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.db import transaction
 from .forms import BibtexUploadForm
 from .models import Article
-# --- MUDANÇA 1: Importe os modelos que vamos precisar ---
+from apps.events.models import Event, Edition  # --- MUDANÇA: Importamos os modelos de Eventos
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
+from datetime import date
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    # Apenas os campos que existem no modelo agora
-    list_display = ('title', 'authors', 'edition', 'created_at')
+    list_display = ('title', 'authors', 'keywords', 'edition', 'created_at')
     list_filter = ('edition', 'created_at',)
-    search_fields = ('title', 'authors', 'abstract')
+    search_fields = ('title', 'authors', 'abstract', 'keywords')
     date_hierarchy = 'created_at'
-    
-    # --- MUDANÇA 3: A nova função para exibir os autores ---
-    def display_authors(self, obj):
-        """Cria uma string com os nomes dos autores para exibir no admin."""
-        return ", ".join([author.name for author in obj.authors.all()])
-    display_authors.short_description = 'Autores'
 
     def get_urls(self):
         urls = super().get_urls()
@@ -31,14 +26,12 @@ class ArticleAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
 
+    @transaction.atomic
     def bulk_upload_view(self, request):
         """
-        Processa o upload de um arquivo BibTeX para criar múltiplos artigos em massa
-        dentro da interface de administração.
+        Processa o upload de um arquivo BibTeX para criar múltiplos artigos em massa,
+        encontrando ou criando Eventos e Edições de forma inteligente.
         """
-        # AVISO: Esta função de bulk upload precisará ser adaptada no futuro
-        # para lidar com a criação ou busca de Autores e Edições.
-        # Por enquanto, vamos deixá-la como está para não quebrar.
         if request.method == 'POST':
             form = BibtexUploadForm(request.POST, request.FILES)
             if form.is_valid():
@@ -49,19 +42,89 @@ class ArticleAdmin(admin.ModelAdmin):
                     bib_database = bibtexparser.loads(bibtex_str, parser=parser)
 
                     created_count = 0
-                    # Esta parte vai dar erro porque 'authors' agora é um ManyToManyField
-                    # e 'edition' é um campo obrigatório.
-                    # É necessário adaptar esta lógica depois que as migrações funcionarem.
+                    skipped_count = 0
+                    failed_entries = []
+
                     for entry in bib_database.entries:
-                        # Artigo de exemplo para evitar que o sistema quebre AGORA
-                        # self.message_user(request, "FUNCIONALIDADE DE BULK UPLOAD DESATIVADA TEMPORARIAMENTE.", messages.WARNING)
-                        pass
-                    
-                    self.message_user(request, f"ATENÇÃO: A importação em massa precisa ser atualizada para o novo modelo de dados.", messages.WARNING)
+                        # Normaliza os campos para minúsculas para facilitar o acesso
+                        entry = {k.lower(): v for k, v in entry.items()}
+
+                        title = entry.get('title')
+                        if not title:
+                            failed_entries.append(f"Entrada sem título: {entry.get('id', 'ID desconhecido')}")
+                            continue
+
+                        # --- Lógica para Evento e Edição ---
+                        event_name = entry.get('journal') or entry.get('booktitle')
+                        year_str = entry.get('year')
+
+                        if not event_name or not year_str:
+                            failed_entries.append(f"Artigo '{title}' sem 'journal'/'booktitle' ou 'year'.")
+                            continue
+                        
+                        try:
+                            year = int(year_str)
+                        except ValueError:
+                            failed_entries.append(f"Artigo '{title}' com ano inválido: '{year_str}'.")
+                            continue
+
+                        # Encontra ou cria o Evento
+                        event, _ = Event.objects.get_or_create(
+                            name=event_name,
+                            defaults={
+                                'acronym': "".join(word[0] for word in event_name.split()[:4]).upper(),
+                                'full_description': f"Evento '{event_name}' criado automaticamente via importação BibTeX."
+                            }
+                        )
+
+                        # Encontra ou cria a Edição
+                        edition, _ = Edition.objects.get_or_create(
+                            event=event,
+                            start_date=date(year, 1, 1), # Data padrão para o ano
+                            defaults={
+                                'location': 'A definir',
+                                'end_date': date(year, 12, 31)
+                            }
+                        )
+                        
+                        # --- Lógica para Artigo ---
+                        # Verifica se o artigo já existe para evitar duplicatas
+                        if Article.objects.filter(title__iexact=title, edition=edition).exists():
+                            skipped_count += 1
+                            continue
+
+                        # Formata os autores
+                        authors_list = entry.get('author', '').replace('\n', ' ').split(' and ')
+                        authors_str = ", ".join(authors_list)
+                        
+                        # Formata as palavras-chave
+                        keywords_str = entry.get('keywords', '')
+
+                        # Cria o Artigo
+                        Article.objects.create(
+                            title=title,
+                            authors=authors_str,
+                            keywords=keywords_str,
+                            abstract=entry.get('abstract', ''),
+                            edition=edition,
+                            submitter=request.user # Associa o artigo ao admin que fez o upload
+                        )
+                        created_count += 1
+
+                    # --- Feedback para o Administrador ---
+                    if created_count > 0:
+                        self.message_user(request, f"{created_count} artigo(s) importado(s) com sucesso.", messages.SUCCESS)
+                    if skipped_count > 0:
+                        self.message_user(request, f"{skipped_count} artigo(s) já existiam e foram ignorados.", messages.INFO)
+                    if failed_entries:
+                        self.message_user(request, f"Falha ao importar {len(failed_entries)} entradas. Detalhes: {'; '.join(failed_entries)}", messages.ERROR)
+                    if created_count == 0 and skipped_count == 0 and not failed_entries:
+                         self.message_user(request, "Nenhum novo artigo encontrado no arquivo.", messages.WARNING)
+
                     return redirect('admin:articles_article_changelist')
 
                 except Exception as e:
-                    self.message_user(request, f"Ocorreu um erro ao processar o arquivo BibTeX: {e}", messages.ERROR)
+                    self.message_user(request, f"Ocorreu um erro crítico ao processar o arquivo BibTeX: {e}", messages.ERROR)
         else:
             form = BibtexUploadForm()
         

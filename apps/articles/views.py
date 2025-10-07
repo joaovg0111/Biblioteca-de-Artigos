@@ -13,6 +13,7 @@ import bibtexparser
 from bibtexparser.bparser import BibTexParser
 import os
 
+
 def home_view(request):
     """
     Exibe a página inicial, incluindo uma lista dos 5 artigos mais recentes.
@@ -91,12 +92,27 @@ def download_pdf_view(request, article_id):
         raise Http404("Arquivo PDF não encontrado no servidor.")
 
 @login_required
+@login_required
 def my_articles_view(request):
     """
-    Exibe uma lista de artigos que o usuário logado enviou.
+    Exibe uma lista de artigos que o usuário logado enviou,
+    agrupados por ano de criação.
     """
-    articles = Article.objects.filter(submitter=request.user).order_by('-created_at')
-    return render(request, 'articles/my_articles.html', {'articles': articles})
+    # Filtra os artigos do usuário logado e ordena do mais recente para o mais antigo
+    articles_list = Article.objects.filter(submitter=request.user).order_by('-created_at')
+    
+    # Cria um dicionário para agrupar os artigos por ano
+    articles_by_year = {}
+    for article in articles_list:
+        year = article.created_at.year
+        if year not in articles_by_year:
+            articles_by_year[year] = []
+        articles_by_year[year].append(article)
+        
+    context = {
+        'articles_by_year': articles_by_year,
+    }
+    return render(request, 'articles/my_articles.html', context)
 
 @login_required
 def article_edit_view(request, article_id):
@@ -140,3 +156,41 @@ def article_detail_view(request, article_id):
         'article': article
     }
     return render(request, 'articles/article_detail.html', context)
+
+def author_list_view(request):
+    """
+    Cria uma lista de todos os autores únicos a partir do campo de texto 'authors'
+    de todos os artigos.
+    """
+    # Usamos values_list para pegar apenas o campo 'authors' e flat=True para obter uma lista de strings
+    all_authors_strings = Article.objects.values_list('authors', flat=True)
+    
+    unique_authors = set()
+    for author_string in all_authors_strings:
+        # Divide a string de autores por vírgula e remove espaços em branco
+        authors = [name.strip() for name in author_string.split(',') if name.strip()]
+        unique_authors.update(authors)
+    
+    # Converte o conjunto para uma lista e ordena em ordem alfabética
+    sorted_authors = sorted(list(unique_authors))
+    
+    context = {
+        'authors': sorted_authors
+    }
+    return render(request, 'articles/author_list.html', context)
+
+
+def author_detail_view(request, author_name):
+    """
+    Exibe uma lista de todos os artigos que contêm o nome do autor especificado
+    em seu campo 'authors'.
+    """
+    # Filtra artigos onde o campo 'authors' contém o nome do autor
+    # A busca é case-insensitive (não diferencia maiúsculas de minúsculas)
+    articles_by_author = Article.objects.filter(authors__icontains=author_name).order_by('-created_at')
+    
+    context = {
+        'author_name': author_name,
+        'articles': articles_by_author
+    }
+    return render(request, 'articles/author_detail.html', context)

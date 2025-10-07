@@ -1,0 +1,17 @@
+Olá, {{ user.first_name|default:user.username }}!
+
+Um novo artigo que corresponde a um de seus interesses foi publicado em nossa biblioteca.
+
+Título: {{ article.title }}
+Autores: {{ article.authors }}
+Palavras-chave Correspondentes: {{ matching_keywords|join:", " }}
+
+Você pode visualizar o artigo completo no seguinte link:
+{{ article_url }}
+
+Obrigado por usar a nossa Biblioteca Digital!
+
+---
+Departamento de Ciência da Computação - UFMG
+
+Você está recebendo este e-mail porque se inscreveu para receber notificações sobre a(s) palavra(s)-chave acima.

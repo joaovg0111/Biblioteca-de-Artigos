@@ -3,22 +3,39 @@
 {% block title %}{{ event.name }}{% endblock %}
 
 {% block content %}
-  <h1 class="text-3xl font-bold text-[#003366]">{{ event.name }} ({{ event.acronym }})</h1>
-  
-  <div class="mt-4 text-gray-700 prose max-w-none">
-    {{ event.full_description|linebreaks }}
-  </div>
+<div class="border-b pb-4 mb-6">
+    <h1 class="text-4xl font-bold text-gray-800">{{ event.name }} ({{ event.acronym }})</h1>
+    
+    {% if event.event_date %}
+        <p class="text-lg text-gray-600 mt-2">Data: {{ event.event_date|date:"d \d\e F \d\e Y" }}</p>
+    {% endif %}
+    
+    <!-- MUDANÇA 1: Adicionada a etiqueta "Resumo:" -->
+    <p class="mt-4 text-gray-700">
+        <strong class="font-semibold text-gray-800">Resumo:</strong> {{ event.full_description }}
+    </p>
 
-  <h2 class="text-2xl font-semibold mt-8 border-b pb-2">Edições do Evento</h2>
-  <ul class="mt-4 list-disc list-inside space-y-2">
-    {% for edition in editions %}
-      <li>
-        <a href="{% url 'events:edition-detail' event_acronym=event.acronym edition_id=edition.id %}" class="text-blue-600 hover:underline">
-          {{ edition }}
-        </a>
-      </li>
-    {% empty %}
-      <li class="text-gray-500">Nenhuma edição cadastrada para este evento.</li>
-    {% endfor %}
-  </ul>
+    {% if event.website %}
+        <a href="{{ event.website }}" target="_blank" class="text-blue-600 hover:underline mt-2 inline-block">Visitar Website Oficial</a>
+    {% endif %}
+</div>
+
+<h2 class="text-2xl font-bold text-gray-700 mb-4">Edições Registradas</h2>
+
+<div class="space-y-4">
+{% for edition in editions %}
+    <!-- MUDANÇA 2: O card da edição agora é um link clicável -->
+    <a href="{% url 'events:edition-detail' edition.id %}" class="block border p-4 rounded-lg shadow-sm hover:shadow-md hover:border-blue-500 transition-all duration-200 group">
+        <h3 class="text-xl font-semibold text-blue-700 group-hover:underline">Edição de {{ edition.year }}</h3>
+        <p class="text-gray-600"><strong>Local:</strong> {{ edition.location }}</p>
+        <p class="text-gray-600"><strong>Período:</strong> de {{ edition.start_date|date:"d/m/Y" }} até {{ edition.end_date|date:"d/m/Y" }}</p>
+        {% if edition.website %}
+            <p class="text-blue-600 mt-1 inline-block">Website da Edição</p>
+        {% endif %}
+    </a>
+{% empty %}
+    <p class="text-gray-500">Nenhuma edição foi registrada para este evento ainda.</p>
+{% endfor %}
+</div>
+
 {% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Artigos{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6 border-b pb-2">Todos os Artigos</h1>
+
+{% if page_obj.object_list %}
+  <div class="space-y-6">
+    {# A lista de artigos está dentro de page_obj.object_list #}
+    {% for article in page_obj.object_list %}
+      <div class="border-b border-gray-200 pb-4">
+        <a href="{% url 'articles:article-detail' article.id %}" class="hover:underline">{{ article.title }}</a>
+        <div class="mt-1 text-sm text-gray-600">
+          <p>
+            <strong>Autores:</strong> {{ article.authors }}
+          </p>
+          <p><strong>Publicado em:</strong> {{ article.edition }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {# --- Controles de Paginação --- #}
+  <div class="mt-8">
+    <nav class="flex justify-center" aria-label="Pagination">
+      <span class="step-links">
+        {% if page_obj.has_previous %}
+          <a href="?page=1" class="px-3 py-1 border rounded-md">&laquo; primeira</a>
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 border rounded-md">anterior</a>
+        {% endif %}
+
+        <span class="current-page px-3 py-1 border bg-blue-100 rounded-md">
+          Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 border rounded-md">próxima</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 border rounded-md">última &raquo;</a>
+        {% endif %}
+      </span>
+    </nav>
+  </div>
+
+{% else %}
+  <p class="text-gray-500 mt-4">Nenhum artigo foi encontrado.</p>
+{% endif %}
+{% endblock %}
