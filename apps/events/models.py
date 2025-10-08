@@ -4,6 +4,8 @@ class Event(models.Model):
     name = models.CharField(max_length=255, verbose_name="Nome Completo do Evento")
     acronym = models.CharField(max_length=20, verbose_name="Acrónimo")
     
+    entidade_promotora = models.CharField("Entidade Promotora", max_length=200, blank=True)
+    
     # --- MUDANÇA: Novo campo adicionado para a data principal do evento ---
     # null=True e blank=True permitem que eventos existentes não quebrem
     # e que a data seja opcional no painel de administração.

@@ -9,6 +9,10 @@
     {% if event.event_date %}
         <p class="text-lg text-gray-600 mt-2">Data: {{ event.event_date|date:"d \d\e F \d\e Y" }}</p>
     {% endif %}
+
+    {% if event.entidade_promotora %}
+        <p class="text-md text-gray-500 mt-2"><strong>Promovido por:</strong> {{ event.entidade_promotora }}</p>
+    {% endif %}
     
     <!-- MUDANÇA 1: Adicionada a etiqueta "Resumo:" -->
     <p class="mt-4 text-gray-700">
