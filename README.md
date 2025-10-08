@@ -63,24 +63,24 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 ## 📆 Backlog da Sprint
 
 ### História 1: Como administrador, eu quero cadastrar, editar e deletar um evento e suas edições.
-- Criar os modelos de dados `Event` e `Edition` com seus respectivos campos e relacionamentos. – **[Membro]**
-- Registrar os modelos no painel de administração (`admin.py`) para permitir o gerenciamento via interface. – **[Membro]**
-- Criar as views e templates para a listagem pública (`event_list`) e detalhamento (`event_detail`) dos eventos. – **[Membro]**
-- Criar as views e templates para a detalhamento (`edition_detail`) das edições. – **[João Vitor]**
+- Criar a estrutura do banco de dados para armazenar eventos e edições. – **[Membro]**
+- Implementar as funcionalidades de gerenciamento no painel de administração. – **[Membro]**
+- Desenvolver as páginas públicas para visualização dos eventos. – **[Membro]**
+- Desenvolver as páginas públicas para visualização das edições. – **[João Vitor]**
 
 ### História 2: Como usuário, eu quero pesquisar artigos por título, autor e nome do evento.
-- Implementar a barra de busca no `base.html` e direcionar para a URL de busca. – **[Membro]**
-- Criar a view `article_search_view` no backend, contendo a lógica de consulta com `Q objects` para buscar em múltiplos campos. – **[Membro]**
-- Criar o template `article_search_results.html` para exibir os resultados da busca de forma clara para o usuário. – **[Membro]**
+- Implementar a interface da barra de busca no frontend. – **[Membro]**
+- Desenvolver a lógica de busca no backend para consultar o banco de dados. – **[Membro]**
+- Criar a página de exibição dos resultados da busca. – **[Membro]**
 
 ### História 3: Como usuário, eu quero ter uma home page com os meus artigos, organizados por ano.
-- Implementar a view `my_articles_view`, protegida por `@login_required`, para filtrar artigos pelo `request.user`. – **[Membro]**
-- Adicionar a lógica de programação para agrupar os artigos em um dicionário onde as chaves são os anos. – **[Membro]**
-- Criar o template `my_articles.html` com loops aninhados para renderizar os artigos agrupados por ano. – **[Membro]**
-- Adicionar o link "Meus Artigos" no menu do usuário no `base.html`. – **[João Vitor]**
+- Implementar a lógica no backend para filtrar os artigos do usuário logado. – **[Membro]**
+- Desenvolver a funcionalidade de agrupar os artigos por ano de publicação. – **[Membro]**
+- Criar a interface da página "Meus Artigos" para exibir os resultados. – **[João Vitor]**
+- Adicionar o link de acesso à página no menu do usuário. – **[João Vitor]**
 
 ### História 4: Como administrador, eu quero cadastrar artigos em massa a partir de um arquivo BibTeX.
-- Implementar a view `bulk_upload_view` no `ArticleAdmin` para processar o upload do arquivo. – **[João Vitor]**
-- Adicionar a lógica de parsing do arquivo `.bib` usando a biblioteca `bibtexparser`. – **[João Vitor]**
-- Implementar a lógica "get or create" para encontrar ou criar `Eventos` e `Edições` com base nos dados do arquivo. – **[João Vitor]**
-- Criar os templates customizados do admin (`change_list.html` e `bulk_upload.html`) para exibir o botão e a página de upload. – **[João Vitor]**
+- Criar a interface de upload de arquivos no painel de administração. – **[João Vitor]**
+- Implementar a lógica no backend para ler e interpretar o arquivo BibTeX. – **[João Vitor]**
+- Desenvolver a funcionalidade para criar ou associar eventos e edições automaticamente. – **[João Vitor]**
+- Implementar a criação dos artigos no banco de dados e fornecer feedback ao administrador. – **[João Vitor]**
