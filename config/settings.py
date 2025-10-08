@@ -1,4 +1,9 @@
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$s7!d&snj^)h2sz-m1jvt$_ht_y&@*=(not^s_u=&54zcpox)5'
@@ -77,15 +82,36 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- MUDANÇA: Adicione estas linhas para configurar o e-mail ---
-# Configuração de E-mail (para testes, imprime no console)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# --- CONFIGURAÇÃO DE E-MAIL ---
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    # Se as credenciais SMTP estiverem definidas, usa o backend SMTP para enviar e-mails reais.
+    # Exemplo para Gmail (requer "Senha de App" se a verificação em 2 etapas estiver ativa).
+    print("\n✅ Credenciais de e-mail encontradas! Configurando para envio via SMTP (Gmail)...")
+    # --- MUDANÇA: Alterando de TLS para SSL ---
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 465)) # Porta para SSL
+    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'True') == 'True' # Usar SSL em vez de TLS
+    EMAIL_USE_TLS = False # Garantir que TLS não seja usado
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+    # --- DEBUGGING: Imprime as configurações que estão sendo usadas (exceto a senha) ---
+    print(f"   - EMAIL_HOST: {EMAIL_HOST}")
+    print(f"   - EMAIL_PORT: {EMAIL_PORT}")
+    print(f"   - EMAIL_USE_SSL: {EMAIL_USE_SSL}")
+    print(f"   - EMAIL_HOST_USER: {EMAIL_HOST_USER}\n")
+else:
+    # Se as credenciais não estiverem definidas, imprime os e-mails no console.
+    # Isso evita que o servidor quebre durante o desenvolvimento.
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    print("\nAVISO: Credenciais de e-mail não configuradas. E-mails serão impressos no console.\n")

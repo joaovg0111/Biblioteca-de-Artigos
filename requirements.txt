@@ -21,3 +21,6 @@ bibtexparser>=1.4.0
 
 # --- Optional: PDF generation (for export/print views of article pages) ---
 WeasyPrint>=61.0
+
+# --- Environment variables from .env file (used in settings.py) ---
+python-dotenv>=1.0.0
