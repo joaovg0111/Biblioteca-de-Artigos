@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar Artigo{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto text-center">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Como você deseja adicionar artigos?</h1>
+    <p class="text-gray-600 mb-10">
+        Escolha uma das opções abaixo para cadastrar novos artigos na plataforma.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Opção 1: Cadastro Individual -->
+        <a href="{% url 'admin:articles_article_add' %}" class="block p-8 bg-white rounded-lg border shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <h2 class="text-2xl font-semibold text-[#003366] mb-3">Cadastro Individual</h2>
+            <p class="text-gray-500">
+                Preencha um formulário para adicionar um único artigo, incluindo o upload do arquivo PDF.
+            </p>
+        </a>
+
+        <!-- Opção 2: Importação em Massa -->
+        <a href="{% url 'admin:articles_article_bulk_upload' %}" class="block p-8 bg-white rounded-lg border shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <h2 class="text-2xl font-semibold text-green-700 mb-3">Importar em Massa (BibTeX)</h2>
+            <p class="text-gray-500">
+                Envie um arquivo <code>.bib</code> para cadastrar múltiplos artigos de uma só vez de forma rápida.
+            </p>
+        </a>
+    </div>
+</div>
+{% endblock %}

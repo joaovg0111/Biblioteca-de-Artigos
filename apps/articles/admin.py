@@ -8,6 +8,8 @@ from django.db import transaction
 from .forms import BibtexUploadForm
 from .models import Article
 from apps.events.models import Event, Edition  # --- MUDANÇA: Importamos os modelos de Eventos
+import zipfile
+from django.core.files.base import ContentFile
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
 from datetime import date
@@ -35,7 +37,21 @@ class ArticleAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             form = BibtexUploadForm(request.POST, request.FILES)
             if form.is_valid():
+                # --- MUDANÇA: Processa os dois arquivos do formulário ---
                 bibtex_file = form.cleaned_data['bibtex_file']
+                pdf_zip_file = form.cleaned_data.get('pdf_zip_file') # Opcional
+                
+                pdf_files = {}
+                if pdf_zip_file:
+                    try:
+                        with zipfile.ZipFile(pdf_zip_file, 'r') as zf:
+                            for filename in zf.namelist():
+                                if filename.lower().endswith('.pdf'):
+                                    pdf_files[filename] = zf.read(filename)
+                    except zipfile.BadZipFile:
+                        self.message_user(request, "O arquivo ZIP com os PDFs é inválido.", messages.ERROR)
+                        return redirect('.')
+
                 try:
                     bibtex_str = bibtex_file.read().decode('utf-8')
                     parser = BibTexParser(common_strings=True)
@@ -44,10 +60,12 @@ class ArticleAdmin(admin.ModelAdmin):
                     created_count = 0
                     skipped_count = 0
                     failed_entries = []
+                    skipped_entries = []
 
                     for entry in bib_database.entries:
                         # Normaliza os campos para minúsculas para facilitar o acesso
                         entry = {k.lower(): v for k, v in entry.items()}
+                        entry_key = entry.get('id') # Ex: 'sbes-paper1'
 
                         title = entry.get('title')
                         if not title:
@@ -59,13 +77,13 @@ class ArticleAdmin(admin.ModelAdmin):
                         year_str = entry.get('year')
 
                         if not event_name or not year_str:
-                            failed_entries.append(f"Artigo '{title}' sem 'journal'/'booktitle' ou 'year'.")
+                            failed_entries.append(f"Artigo '{title}' (ID: {entry_key}) sem 'journal'/'booktitle' ou 'year'.")
                             continue
                         
                         try:
                             year = int(year_str)
                         except ValueError:
-                            failed_entries.append(f"Artigo '{title}' com ano inválido: '{year_str}'.")
+                            failed_entries.append(f"Artigo '{title}' (ID: {entry_key}) com ano inválido: '{year_str}'.")
                             continue
 
                         # Encontra ou cria o Evento
@@ -90,18 +108,18 @@ class ArticleAdmin(admin.ModelAdmin):
                         # --- Lógica para Artigo ---
                         # Verifica se o artigo já existe para evitar duplicatas
                         if Article.objects.filter(title__iexact=title, edition=edition).exists():
-                            skipped_count += 1
+                            skipped_entries.append(f"'{title}' (ID: {entry_key})")
                             continue
 
                         # Formata os autores
-                        authors_list = entry.get('author', '').replace('\n', ' ').split(' and ')
-                        authors_str = ", ".join(authors_list)
+                        authors_list = [author.strip() for author in entry.get('author', '').replace('\n', ' ').split(' and ')]
+                        authors_str = ", ".join(filter(None, authors_list))
                         
                         # Formata as palavras-chave
                         keywords_str = entry.get('keywords', '')
 
-                        # Cria o Artigo
-                        Article.objects.create(
+                        # Cria o objeto Artigo
+                        new_article = Article(
                             title=title,
                             authors=authors_str,
                             keywords=keywords_str,
@@ -109,16 +127,26 @@ class ArticleAdmin(admin.ModelAdmin):
                             edition=edition,
                             submitter=request.user # Associa o artigo ao admin que fez o upload
                         )
+
+                        # --- MUDANÇA: Lógica para anexar o PDF (se existir) ---
+                        if entry_key and pdf_files:
+                            pdf_filename_to_find = f"{entry_key}.pdf"
+                            if pdf_filename_to_find in pdf_files:
+                                pdf_content = pdf_files[pdf_filename_to_find]
+                                new_article.pdf_file.save(pdf_filename_to_find, ContentFile(pdf_content), save=False)
+                                new_article.original_filename = pdf_filename_to_find
+
+                        new_article.save()
                         created_count += 1
 
                     # --- Feedback para o Administrador ---
                     if created_count > 0:
                         self.message_user(request, f"{created_count} artigo(s) importado(s) com sucesso.", messages.SUCCESS)
-                    if skipped_count > 0:
-                        self.message_user(request, f"{skipped_count} artigo(s) já existiam e foram ignorados.", messages.INFO)
+                    if skipped_entries:
+                        self.message_user(request, f"{len(skipped_entries)} artigo(s) já existiam e foram ignorados: {'; '.join(skipped_entries)}", messages.INFO)
                     if failed_entries:
-                        self.message_user(request, f"Falha ao importar {len(failed_entries)} entradas. Detalhes: {'; '.join(failed_entries)}", messages.ERROR)
-                    if created_count == 0 and skipped_count == 0 and not failed_entries:
+                        self.message_user(request, f"Falha ao importar {len(failed_entries)} entrada(s). Detalhes: {'; '.join(failed_entries)}", messages.WARNING)
+                    if created_count == 0 and not skipped_entries and not failed_entries:
                          self.message_user(request, "Nenhum novo artigo encontrado no arquivo.", messages.WARNING)
 
                     return redirect('admin:articles_article_changelist')

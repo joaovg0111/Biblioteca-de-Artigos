@@ -185,12 +185,18 @@ def author_detail_view(request, author_name):
     Exibe uma lista de todos os artigos que contêm o nome do autor especificado
     em seu campo 'authors'.
     """
+    # --- CORREÇÃO: Decodifica o nome do autor da URL ---
+    # Nomes com espaços (ex: "Aline Vasconcelos") são passados como "Aline%20Vasconcelos" na URL.
+    # A decodificação garante que o nome seja usado corretamente na busca.
+    from urllib.parse import unquote
+    decoded_author_name = unquote(author_name)
+
     # Filtra artigos onde o campo 'authors' contém o nome do autor
     # A busca é case-insensitive (não diferencia maiúsculas de minúsculas)
-    articles_by_author = Article.objects.filter(authors__icontains=author_name).order_by('-created_at')
+    articles_by_author = Article.objects.filter(authors__icontains=decoded_author_name).order_by('-created_at')
     
     context = {
-        'author_name': author_name,
+        'author_name': decoded_author_name,
         'articles': articles_by_author
     }
     return render(request, 'articles/author_detail.html', context)

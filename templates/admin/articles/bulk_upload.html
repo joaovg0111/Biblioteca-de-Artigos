@@ -38,7 +38,7 @@
     <!-- MUDANÇA: A tag <h1> que estava aqui foi REMOVIDA para corrigir a duplicação -->
 
     <p class="mb-4">
-        Selecione um arquivo <code>.bib</code> para importar múltiplos artigos. O sistema tentará encontrar ou criar os eventos e edições correspondentes com base nos campos <code>journal</code>, <code>booktitle</code> e <code>year</code> do arquivo BibTeX.
+        Selecione um arquivo <code>.bib</code> para importar múltiplos artigos. Opcionalmente, envie um arquivo <code>.zip</code> com os PDFs correspondentes.
     </p>
 
     <form method="post" enctype="multipart/form-data">
@@ -49,6 +49,16 @@
                 {{ form.bibtex_file }}
                 {% if form.bibtex_file.errors %}
                     <div class="errors">{{ form.bibtex_file.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-row">
+                {{ form.pdf_zip_file.label_tag }}
+                {{ form.pdf_zip_file }}
+                {% if form.pdf_zip_file.help_text %}
+                    <div class="help">{{ form.pdf_zip_file.help_text|safe }}</div>
+                {% endif %}
+                {% if form.pdf_zip_file.errors %}
+                    <div class="errors">{{ form.pdf_zip_file.errors }}</div>
                 {% endif %}
             </div>
         </fieldset>

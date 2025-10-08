@@ -1,0 +1,41 @@
+{% load i18n %}
+
+{% if app_list %}
+  {% for app in app_list %}
+    <div class="app-{{ app.app_label }} module">
+      <table>
+        <caption>
+          <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
+        </caption>
+        
+        {# --- Custom links for the 'ARTIGOS' app --- #}
+        {% if app.app_label == 'articles' %}
+            <tr class="model-article-individual">
+                <th scope="row"><a href="{% url 'admin:articles_article_add' %}">Cadastrar PDF</a></th>
+                <td><a href="{% url 'admin:articles_article_add' %}" class="addlink">Adicionar</a></td>
+                <td></td>
+            </tr>
+            <tr class="model-article-bulk">
+                <th scope="row"><a href="{% url 'admin:articles_article_bulk_upload' %}">Importar via BibTeX</a></th>
+                <td><a href="{% url 'admin:articles_article_bulk_upload' %}" class="addlink">Adicionar</a></td>
+                <td></td>
+            </tr>
+            <tr class="model-article-list">
+                <th scope="row"><a href="{% url 'admin:articles_article_changelist' %}">Gerenciar Artigos</a></th>
+                <td></td>
+                <td><a href="{% url 'admin:articles_article_changelist' %}" class="changelink">Modificar</a></td>
+            </tr>
+        {# --- Default links for other apps --- #}
+        {% else %}
+            {% for model in app.models %}
+              <tr class="model-{{ model.object_name|lower }}">
+                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                {% if model.add_url %}<td><a href="{{ model.add_url }}" class="addlink">Adicionar</a></td>{% else %}<td></td>{% endif %}
+                {% if model.admin_url %}<td><a href="{{ model.admin_url }}" class="changelink">Modificar</a></td>{% else %}<td></td>{% endif %}
+              </tr>
+            {% endfor %}
+        {% endif %}
+      </table>
+    </div>
+  {% endfor %}
+{% endif %}

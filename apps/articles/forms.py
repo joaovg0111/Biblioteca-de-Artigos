@@ -16,6 +16,15 @@ class ArticleForm(forms.ModelForm):
         model = Article
         fields = ['title', 'authors', 'abstract', 'pdf_file']
 
+    def clean_authors(self):
+        """
+        Limpa e formata a string de autores.
+        Garante que os nomes sejam separados por vírgula e sem espaços extras.
+        """
+        authors_string = self.cleaned_data.get('authors', '')
+        authors_list = [author.strip() for author in authors_string.split(',') if author.strip()]
+        return ", ".join(authors_list)
+
 class BibtexUploadForm(forms.Form):
     bibtex_file = forms.FileField(
         label="Arquivo BibTeX (.bib)",
@@ -29,4 +38,19 @@ class BibtexUploadForm(forms.Form):
                 'hover:file:bg-blue-100'
             )
         })
+    )
+    pdf_zip_file = forms.FileField(
+        label="Arquivo ZIP com PDFs (Opcional)",
+        required=False,
+        widget=forms.ClearableFileInput(attrs={
+            'class': (
+                'block w-full text-sm text-gray-500 '
+                'file:mr-4 file:py-2 file:px-4 '
+                'file:rounded-md file:border-0 '
+                'file:text-sm file:font-semibold '
+                'file:bg-purple-50 file:text-purple-700 '
+                'hover:file:bg-purple-100'
+            )
+        }),
+        help_text="Envie um arquivo .zip contendo os PDFs. O nome de cada PDF deve ser igual ao ID da entrada BibTeX (ex: sbes-paper1.pdf)."
     )

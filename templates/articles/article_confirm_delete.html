@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Confirmar Exclusão</h1>
+    <p class="text-gray-600 mb-8">
+        Você tem certeza que deseja excluir o artigo "<strong>{{ article.title }}</strong>"?
+        <br>
+        <span class="text-red-600 font-medium">Esta ação não pode ser desfeita.</span>
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="flex justify-center space-x-4">
+            <a href="{% url 'articles:my-articles' %}" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-md font-medium hover:bg-gray-400 transition">
+                Cancelar
+            </a>
+            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-md font-medium hover:bg-red-700 transition">
+                Sim, Excluir
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

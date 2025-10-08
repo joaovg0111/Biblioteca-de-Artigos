@@ -18,7 +18,7 @@ class Article(models.Model):
     submitter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Enviado por")
     title = models.CharField("Título", max_length=255)
     
-    authors = models.CharField("Autores", max_length=500)
+    authors = models.CharField("Autores", max_length=500, help_text="Separe os nomes dos autores por vírgula")
     
     edition = models.ForeignKey(Edition, on_delete=models.CASCADE, verbose_name="Edição", related_name="articles", null=True, blank=True)
 
