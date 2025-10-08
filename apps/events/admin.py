@@ -38,8 +38,16 @@ class EditionInline(admin.TabularInline):
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = ('acronym', 'name', 'promoting_entity')
-    search_fields = ('name', 'acronym', 'promoting_entity')
-    inlines = [EditionInline] 
+    search_fields = ('name', 'acronym', 'promoting_entity') # 검색 필드 유지
+    inlines = [EditionInline]
+
+    # --- CORREÇÃO: Define explicitamente os campos para evitar duplicatas ---
+    # 폼에 표시될 필드를 명시적으로 지정합니다.
+    fields = ('name', 'acronym', 'promoting_entity', 'full_description', 'website')
+
+    # 'promoting_entity' 필드에 검색 위젯을 적용하여 사용성을 개선합니다.
+    # (이 필드가 ForeignKey로 변경될 경우 특히 유용합니다.)
+    # raw_id_fields = ('promoting_entity',) # 현재는 CharField이므로 주석 처리
 
 @admin.register(Edition)
 class EditionAdmin(admin.ModelAdmin):

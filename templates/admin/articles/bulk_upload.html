@@ -30,11 +30,8 @@
 {% block content %}
 <div id="content-main">
     <p class="mb-4">
-<<<<<<< HEAD
-        Selecione um arquivo <code>.bib</code> para importar múltiplos artigos. Opcionalmente, envie um arquivo <code>.zip</code> com os PDFs correspondentes.
-=======
-        Selecione um arquivo <code>.bib</code> <strong>OU</strong> cole o conteúdo BibTeX abaixo para importar múltiplos artigos.
->>>>>>> 5042e0d (entrega final)
+        Selecione um arquivo <code>.bib</code> <strong>OU</strong> cole o conteúdo BibTeX abaixo para importar múltiplos artigos. 
+        Opcionalmente, envie um arquivo <code>.zip</code> com os PDFs correspondentes.
     </p>
 
     <form method="post" enctype="multipart/form-data">
@@ -53,13 +50,6 @@
                 {{ form.bibtex_text.label_tag }}
                 {{ form.bibtex_text }}
                 {% if form.bibtex_text.errors %}<div class="errors">{{ form.bibtex_text.errors }}</div>{% endif %}
-            </div>
-             <div class="form-row">
-                <label class="checkbox-label">
-                    {{ form.ignore_missing_fields }}
-                    <span>{{ form.ignore_missing_fields.label }}</span>
-                </label>
-                {% if form.ignore_missing_fields.errors %}<div class="errors">{{ form.ignore_missing_fields.errors }}</div>{% endif %}
             </div>
             <div class="form-row">
                 {{ form.pdf_zip_file.label_tag }}
