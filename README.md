@@ -90,6 +90,8 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 
 ## 🏛️ Arquitetura do Sistema (UML)
 
+O diagrama de classes abaixo ilustra a estrutura dos principais modelos de dados do sistema e seus relacionamentos.
+
 ```mermaid
 classDiagram
     class User {
@@ -126,10 +128,13 @@ classDiagram
     User "1" -- "0..*" UserInterest : possui
     Event "1" -- "0..*" Edition : tem
     Edition "1" -- "0..*" Article : contém
+```
 
 ---
 
 ## 🗺️ Fluxograma do Sistema
+
+Este fluxograma descreve o fluxo geral de interações do usuário com a plataforma, desde a navegação básica até as funcionalidades administrativas e processos automatizados.
 
 ```mermaid
 graph TD
@@ -168,3 +173,4 @@ graph TD
         T --> U{Há correspondência?};
         U -- Sim --> V[Envia e-mail de notificação];
     end
+```
