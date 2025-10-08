@@ -20,7 +20,7 @@ A plataforma conta com um conjunto completo de funcionalidades para administrado
 
 ---
 
-## 👥 Membros da Equipe e Papéis
+## 👥 Luizs da Equipe e Papéis
 
 | Nome | Matrícula | Papel |
 |--------------|------------|-----------|
@@ -63,9 +63,9 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 ## 📆 Backlog da Sprint
 
 ### História 1: Como administrador, eu quero cadastrar, editar e deletar um evento e suas edições.
-- Criar a estrutura do banco de dados para armazenar eventos e edições. – **[Membro]**
-- Implementar as funcionalidades de gerenciamento no painel de administração. – **[Membro]**
-- Desenvolver as páginas públicas para visualização dos eventos. – **[Membro]**
+- Criar a estrutura do banco de dados para armazenar eventos e edições. – **[Luiz]**
+- Implementar as funcionalidades de gerenciamento no painel de administração. – **[Luiz]**
+- Desenvolver as páginas públicas para visualização dos eventos. – **[Luiz]**
 - Desenvolver as páginas públicas para visualização das edições. – **[João Vitor]**
 
 ### História 2: Como usuário, eu quero pesquisar artigos por título, autor e nome do evento.
@@ -75,7 +75,7 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 
 ### História 3: Como usuário, eu quero ter uma home page com os meus artigos, organizados por ano.
 - Implementar a lógica no backend para filtrar os artigos do usuário logado. – **[Leonardo]**
-- Desenvolver a funcionalidade de agrupar os artigos por ano de publicação. – **[Membro]**
+- Desenvolver a funcionalidade de agrupar os artigos por ano de publicação. – **[Luiz]**
 - Criar a interface da página "Meus Artigos" para exibir os resultados. – **[João Vitor]**
 - Adicionar o link de acesso à página no menu do usuário. – **[João Vitor]**
 
