@@ -84,7 +84,8 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 - Implementar a lógica no backend para ler e interpretar o arquivo BibTeX. – **[João Vitor]**
 - Desenvolver a funcionalidade para criar ou associar eventos e edições automaticamente. – **[João Vitor]**
 - Implementar a criação dos artigos no banco de dados e fornecer feedback ao administrador. – **[João Vitor]**
-- Implementar a funcionalidade de leitura e integração de arquivos PDF e .bib contidos em um arquivo .zip. **[Seungbin Han]**
+- Implementar a funcionalidade de leitura e integração de arquivos PDF e .bib contidos em um arquivo .zip. **[Seungbin]**
+- Implementar endpoints de CRUD de artigos no painel de administração. – **[Seungbin]**
 
 ---
 
