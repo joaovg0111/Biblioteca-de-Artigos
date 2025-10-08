@@ -70,8 +70,8 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 
 ### História 2: Como usuário, eu quero pesquisar artigos por título, autor e nome do evento.
 - Implementar a interface da barra de busca no frontend. – **[Membro]**
-- Desenvolver a lógica de busca no backend para consultar o banco de dados. – **[Membro]**
-- Criar a página de exibição dos resultados da busca. – **[Membro]**
+- Desenvolver a lógica de busca no backend para consultar o banco de dados. – **[Leonardo]**
+- Criar a página de exibição dos resultados da busca. – **[Leonardo]**
 
 ### História 3: Como usuário, eu quero ter uma home page com os meus artigos, organizados por ano.
 - Implementar a lógica no backend para filtrar os artigos do usuário logado. – **[Membro]**
