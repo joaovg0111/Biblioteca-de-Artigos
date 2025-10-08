@@ -60,26 +60,27 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 
 ---
 
-## 📆 Backlog da Sprint (Exemplo de Divisão de Tarefas)
+## 📆 Backlog da Sprint
 
-### História 1: Gerenciamento de Conteúdo (Eventos, Edições e Artigos)
-- Criar modelos de dados para `Event`, `Edition` e `Article`. – **[Feito]**
-- Registrar modelos no painel de administração do Django. – **[Feito]**
-- Criar views e templates para a listagem e detalhamento de eventos e edições. – **[Feito]**
+### História 1: Como administrador, eu quero cadastrar, editar e deletar um evento e suas edições.
+- Criar os modelos de dados `Event` e `Edition` com seus respectivos campos e relacionamentos. – **[Membro]**
+- Registrar os modelos no painel de administração (`admin.py`) para permitir o gerenciamento via interface. – **[Membro]**
+- Criar as views e templates para a listagem pública (`event_list`) e detalhamento (`event_detail`) dos eventos. – **[Membro]**
+- Criar as views e templates para a detalhamento (`edition_detail`) das edições. – **[João Vitor]**
 
-### História 2: Funcionalidades de Usuário (Cadastro, Login, Busca e Página Pessoal)
-- Configurar o aplicativo `users` para cadastro e autenticação. – **[Feito]**
-- Implementar a lógica de busca no backend e a interface no frontend. – **[Feito]**
-- Criar a view `my_articles_view` para filtrar artigos por usuário e agrupar por ano. – **[Feito]**
-- Implementar o template `my_articles.html`. – **[Feito]**
+### História 2: Como usuário, eu quero pesquisar artigos por título, autor e nome do evento.
+- Implementar a barra de busca no `base.html` e direcionar para a URL de busca. – **[Membro]**
+- Criar a view `article_search_view` no backend, contendo a lógica de consulta com `Q objects` para buscar em múltiplos campos. – **[Membro]**
+- Criar o template `article_search_results.html` para exibir os resultados da busca de forma clara para o usuário. – **[Membro]**
 
-### História 3: Funcionalidades Avançadas (Importação em Massa e Notificações)
-- Implementar a view `bulk_upload_view` no `ArticleAdmin` para processar arquivos BibTeX. – **[Feito]**
-- Criar modelo `UserInterest` para armazenar preferências de notificação. – **[Feito]**
-- Implementar a página de gerenciamento de interesses para os usuários. – **[Feito]**
-- Configurar Sinais do Django (`post_save`) para disparar a lógica de envio de e-mails. – **[Feito]**
+### História 3: Como usuário, eu quero ter uma home page com os meus artigos, organizados por ano.
+- Implementar a view `my_articles_view`, protegida por `@login_required`, para filtrar artigos pelo `request.user`. – **[Membro]**
+- Adicionar a lógica de programação para agrupar os artigos em um dicionário onde as chaves são os anos. – **[Membro]**
+- Criar o template `my_articles.html` com loops aninhados para renderizar os artigos agrupados por ano. – **[Membro]**
+- Adicionar o link "Meus Artigos" no menu do usuário no `base.html`. – **[João Vitor]**
 
-### História 4: Melhorias de Interface (UI/UX)
-- Implementar modo claro e escuro (dark mode) para o site principal. – **[Feito]**
-- Implementar um menu de usuário em formato dropdown. – **[Feito]**
-- Implementar modo claro e escuro para o painel de administração do Django. – **[Feito]**
+### História 4: Como administrador, eu quero cadastrar artigos em massa a partir de um arquivo BibTeX.
+- Implementar a view `bulk_upload_view` no `ArticleAdmin` para processar o upload do arquivo. – **[João Vitor]**
+- Adicionar a lógica de parsing do arquivo `.bib` usando a biblioteca `bibtexparser`. – **[João Vitor]**
+- Implementar a lógica "get or create" para encontrar ou criar `Eventos` e `Edições` com base nos dados do arquivo. – **[João Vitor]**
+- Criar os templates customizados do admin (`change_list.html` e `bulk_upload.html`) para exibir o botão e a página de upload. – **[João Vitor]**
