@@ -12,6 +12,7 @@ import zipfile
 from django.core.files.base import ContentFile
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
+from django.utils.html import format_html, escape
 from datetime import date
 
 @admin.register(Article)
@@ -58,9 +59,8 @@ class ArticleAdmin(admin.ModelAdmin):
                     bib_database = bibtexparser.loads(bibtex_str, parser=parser)
 
                     created_count = 0
-                    skipped_count = 0
-                    failed_entries = []
-                    skipped_entries = []
+                    created_articles_titles = [] # --- MUDANÇA: Armazena os títulos dos artigos criados
+                    skipped_articles = []  # (title, reason) 튜플을 저장
 
                     for entry in bib_database.entries:
                         # Normaliza os campos para minúsculas para facilitar o acesso
@@ -69,21 +69,20 @@ class ArticleAdmin(admin.ModelAdmin):
 
                         title = entry.get('title')
                         if not title:
-                            failed_entries.append(f"Entrada sem título: {entry.get('id', 'ID desconhecido')}")
+                            skipped_articles.append((f"ID: {entry.get('id', 'desconhecido')}", "Título não encontrado."))
                             continue
 
                         # --- Lógica para Evento e Edição ---
                         event_name = entry.get('journal') or entry.get('booktitle')
                         year_str = entry.get('year')
-
-                        if not event_name or not year_str:
-                            failed_entries.append(f"Artigo '{title}' (ID: {entry_key}) sem 'journal'/'booktitle' ou 'year'.")
-                            continue
                         
+                        if not event_name or not year_str:
+                            skipped_articles.append((title, "Faltando 'journal'/'booktitle' ou 'year'."))
+                            continue
                         try:
                             year = int(year_str)
                         except ValueError:
-                            failed_entries.append(f"Artigo '{title}' (ID: {entry_key}) com ano inválido: '{year_str}'.")
+                            skipped_articles.append((title, f"Ano inválido: '{year_str}'."))
                             continue
 
                         # Encontra ou cria o Evento
@@ -99,8 +98,11 @@ class ArticleAdmin(admin.ModelAdmin):
                         edition, _ = Edition.objects.get_or_create(
                             event=event,
                             start_date=date(year, 1, 1), # Data padrão para o ano
+                            # --- CORREÇÃO: Adiciona 'location' ao critério de busca ---
+                            # Isso garante que a busca por uma edição existente seja precisa
+                            # e evita erros de integridade ao criar duplicatas.
+                            location='A definir',
                             defaults={
-                                'location': 'A definir',
                                 'end_date': date(year, 12, 31)
                             }
                         )
@@ -108,7 +110,7 @@ class ArticleAdmin(admin.ModelAdmin):
                         # --- Lógica para Artigo ---
                         # Verifica se o artigo já existe para evitar duplicatas
                         if Article.objects.filter(title__iexact=title, edition=edition).exists():
-                            skipped_entries.append(f"'{title}' (ID: {entry_key})")
+                            skipped_articles.append((title, "Artigo já existe na base de dados."))
                             continue
 
                         # Formata os autores
@@ -138,15 +140,24 @@ class ArticleAdmin(admin.ModelAdmin):
 
                         new_article.save()
                         created_count += 1
+                        created_articles_titles.append(new_article.title) # --- MUDANÇA: Adiciona o título à lista
 
                     # --- Feedback para o Administrador ---
                     if created_count > 0:
-                        self.message_user(request, f"{created_count} artigo(s) importado(s) com sucesso.", messages.SUCCESS)
-                    if skipped_entries:
-                        self.message_user(request, f"{len(skipped_entries)} artigo(s) já existiam e foram ignorados: {'; '.join(skipped_entries)}", messages.INFO)
-                    if failed_entries:
-                        self.message_user(request, f"Falha ao importar {len(failed_entries)} entrada(s). Detalhes: {'; '.join(failed_entries)}", messages.WARNING)
-                    if created_count == 0 and not skipped_entries and not failed_entries:
+                        # --- MUDANÇA: Mensagem de sucesso com títulos em negrito ---
+                        success_details = [format_html("<strong>'{}'</strong>", escape(title)) for title in created_articles_titles]
+                        message_html = format_html("{} artigo(s) importado(s) com sucesso: {}", created_count, format_html("; ".join(success_details)))
+                        messages.add_message(request, messages.SUCCESS, message_html, extra_tags='safe')
+                    
+                    if skipped_articles:
+                        # --- MUDANÇA: Formata a mensagem com HTML para destacar o motivo ---
+                        # Usamos format_html para construir uma string HTML segura.
+                        # escape() garante que o título do artigo não seja interpretado como HTML.
+                        skipped_messages = [format_html("<strong>'{}'</strong> (Motivo: <strong style='color: red;'>{}</strong>)", escape(title), escape(reason)) for title, reason in skipped_articles]
+                        message_html = format_html("{} artigo(s) foram ignorados. Detalhes: {}", len(skipped_articles), format_html("<br>".join(skipped_messages)))
+                        messages.add_message(request, messages.WARNING, message_html, extra_tags='safe')
+
+                    if created_count == 0 and not skipped_articles:
                          self.message_user(request, "Nenhum novo artigo encontrado no arquivo.", messages.WARNING)
 
                     return redirect('admin:articles_article_changelist')
