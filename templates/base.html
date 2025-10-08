@@ -11,70 +11,91 @@
     <style>
         .nav-link:hover { background-color: #e0e0e0; }
         
-        /* --- REGRAS DE MODO NOTURNO COM MAIOR CONTRASTE --- */
+        /* --- REGRAS DE MODO NOTURNO --- */
         
         html.dark { color-scheme: dark; }
         
-        /* Regra 1: Padrões Globais */
+        /* 1. Fundo e Texto Padrão */
         html.dark body {
-            /* MUDANÇA: O fundo do corpo agora é preto puro para máximo contraste */
-            background-color: #000000; 
-            color: #d1d5db; /* Texto padrão claro */
+            background-color: #111827; /* Tailwind gray-900 */
+            color: #d1d5db; /* Tailwind gray-300 */
         }
-        
-        /* Regra 2: Inversão Automática de Fundos Claros */
+
+        /* 2. Painéis, Cards e Seções com fundo claro */
         html.dark .bg-white,
         html.dark .bg-gray-50,
         html.dark .bg-gray-100,
         html.dark .bg-gray-200,
-        html.dark .dark-mode-bg { /* Adicionamos .dark-mode-bg aqui para unificar */
-            background-color: #1f2937 !important; /* Fundo cinza-escuro para cards e seções */
-            color: #d1d5db !important;
+        html.dark .dark-mode-bg { /* Classe helper para fundos */
+            background-color: #1f2937 !important; /* Tailwind gray-800 */
         }
 
-        /* Regra 3: Inversão Automática de Cores de Texto */
+        /* 3. Cores de Texto */
         html.dark .text-gray-900,
         html.dark .text-gray-800,
-        html.dark .text-gray-700,
+        html.dark .text-gray-700 {
+            color: #f9fafb !important; /* Tailwind gray-50 */
+        }
         html.dark .text-gray-600,
         html.dark .text-gray-500 {
-            color: #d1d5db !important;
+            color: #d1d5db !important; /* Tailwind gray-300 */
         }
         html.dark .text-gray-400 {
-            color: #9ca3af !important;
+            color: #9ca3af !important; /* Tailwind gray-400 */
         }
-        
-        /* Regra 4: Elementos de Texto Genéricos */
         html.dark h1, html.dark h2, html.dark h3, html.dark h4 {
-            color: #f9fafb !important;
+            color: #f9fafb;
         }
         html.dark strong { color: #f9fafb; }
-
-        /* Regra 5: Links e Cores de Destaque */
-        html.dark a, html.dark .text-blue-700, html.dark .text-blue-600 { color: #60a5fa !important; }
+        
+        /* 4. Links e Cores de Destaque */
+        html.dark a,
+        html.dark .text-blue-700,
+        html.dark .text-blue-600 {
+            color: #60a5fa !important; /* Tailwind blue-400 */
+        }
         html.dark a:hover { text-decoration: underline; }
-        html.dark .text-red-600, html.dark .text-red-500 { color: #f87171 !important; }
-
-        /* Regra 6: Bordas */
-        html.dark .border,
-        html.dark .border-gray-200,
-        html.dark .dark-mode-border { /* Adicionamos .dark-mode-border aqui */
-            border-color: #4b5563 !important; /* Borda escura */
+        html.dark .text-red-600, 
+        html.dark .text-red-500 {
+            color: #f87171 !important; /* Tailwind red-400 */
         }
 
-        /* Regra 7: Formulários */
+        /* 5. Bordas */
+        html.dark .border,
+        html.dark .border-gray-100,
+        html.dark .border-gray-200,
+        html.dark .border-gray-300,
+        html.dark .dark-mode-border { /* Classe helper para bordas */
+            border-color: #374151 !important; /* Tailwind gray-700 */
+        }
+
+        /* 6. Formulários */
         html.dark input[type="text"],
-        html.dark input[type="search"] {
-            background-color: #374151 !important;
-            border-color: #6b7280 !important;
+        html.dark input[type="search"],
+        html.dark input[type="email"],
+        html.dark input[type="password"],
+        html.dark textarea,
+        html.dark select {
+            background-color: #374151 !important; /* Tailwind gray-700 */
+            border-color: #4b5563 !important; /* Tailwind gray-600 */
             color: #f9fafb !important;
         }
         html.dark input::placeholder { color: #9ca3af; }
 
-        /* Regra 8: Navegação e Rodapé (específicos) */
-        html.dark .nav-link { color: #d1d5db; }
-        html.dark .nav-link:hover { background-color: #374151; }
-        html.dark footer { background-color: #000; }
+        /* 7. Navegação e Rodapé */
+        html.dark .nav-link { 
+            color: #d1d5db;
+        }
+        html.dark .nav-link:hover { 
+            background-color: #374151; /* Tailwind gray-700 */
+        }
+        html.dark footer { 
+            background-color: #111827; /* Tailwind gray-900 */
+        }
+        /* Menu dropdown do usuário */
+        html.dark .group-hover\:visible a:hover {
+            background-color: #374151;
+        }
     </style>
     
     <script>
@@ -104,10 +125,10 @@
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                             </button>
                             <div class="absolute right-0 mt-2 w-56 bg-white dark-mode-bg rounded-md shadow-lg py-1 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                                <a href="{% url 'articles:my-articles' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">Meus Artigos</a>
-                                <a href="{% url 'notifications:manage-interests' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">Gerenciar Notificações</a>
+                                <a href="{% url 'articles:my-articles' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Meus Artigos</a>
+                                <a href="{% url 'notifications:manage-interests' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Gerenciar Notificações</a>
                                 <div class="border-t border-gray-100 dark-mode-border my-1"></div>
-                                <a href="{% url 'users:logout' %}" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+                                <a href="{% url 'users:logout' %}" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
                             </div>
                         </div>
                     {% else %}
@@ -132,14 +153,18 @@
                     <a href="{% url 'articles:article-list' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition">Artigos</a>
                     <a href="{% url 'events:event-list' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition">Eventos</a>
                     {% if user.is_authenticated and user.is_staff %}
-                        <a href="{% url 'articles:add-article-options' %}" class="nav-link text-gray-700 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium transition">Adicionar Artigo</a>
                         <a href="{% url 'admin:index' %}" class="nav-link text-red-600 hover:text-red-800 px-3 py-2 rounded-md text-sm font-medium transition">Administração</a>
                     {% endif %}
                 </div>
                 <div>
-                    <form action="{% url 'articles:article-search' %}" method="get" class="flex items-center">
-                        <input type="search" name="q" placeholder="Buscar artigos..." class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        <button type="submit" class="ml-2 px-4 py-2 bg-[#003366] text-white rounded-md text-sm font-medium hover:bg-[#002244] transition">Buscar</button>
+                    <form action="{% url 'articles:article-search' %}" method="get" class="flex items-center space-x-2">
+                        <input type="search" name="q" value="{{ query|default:'' }}" placeholder="Buscar..." class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48" required>
+                        <select name="search_field" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="title" {% if search_field == 'title' %}selected{% endif %}>Título</option>
+                            <option value="author" {% if search_field == 'author' %}selected{% endif %}>Autor</option>
+                            <option value="event" {% if search_field == 'event' %}selected{% endif %}>Evento</option>
+                        </select>
+                        <button type="submit" class="px-4 py-2 bg-[#003366] text-white rounded-md text-sm font-medium hover:bg-[#002244] transition">Buscar</button>
                     </form>
                 </div>
             </div>
@@ -184,11 +209,14 @@
             if (themeToggleButton) {
                 var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
                 var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+                
+                // CORREÇÃO: Mostra o ícone para MUDAR de tema
                 if (document.documentElement.classList.contains('dark')) {
-                    themeToggleLightIcon.classList.remove('hidden');
+                    themeToggleLightIcon.classList.remove('hidden');  // Em modo escuro, mostra o SOL
                 } else {
-                    themeToggleDarkIcon.classList.remove('hidden');
+                    themeToggleDarkIcon.classList.remove('hidden'); // Em modo claro, mostra a LUA
                 }
+
                 themeToggleButton.addEventListener('click', function() {
                     themeToggleDarkIcon.classList.toggle('hidden');
                     themeToggleLightIcon.classList.toggle('hidden');

@@ -1,13 +1,13 @@
 # COPIE E COLE O CONTEÚDO COMPLETO PARA: apps/articles/admin.py
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.urls import path
 from django.shortcuts import render, redirect
-from django.contrib import messages
 from django.db import transaction
-from .forms import BibtexUploadForm
+from django.forms import formset_factory
+from .forms import BibtexUploadForm, ArticlePreviewForm
 from .models import Article
-from apps.events.models import Event, Edition  # --- MUDANÇA: Importamos os modelos de Eventos
+from apps.events.models import Event, Edition
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
 from datetime import date
@@ -26,108 +26,121 @@ class ArticleAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
 
-    @transaction.atomic
     def bulk_upload_view(self, request):
-        """
-        Processa o upload de um arquivo BibTeX para criar múltiplos artigos em massa,
-        encontrando ou criando Eventos e Edições de forma inteligente.
-        """
-        if request.method == 'POST':
-            form = BibtexUploadForm(request.POST, request.FILES)
-            if form.is_valid():
-                bibtex_file = form.cleaned_data['bibtex_file']
-                try:
-                    bibtex_str = bibtex_file.read().decode('utf-8')
-                    parser = BibTexParser(common_strings=True)
-                    bib_database = bibtexparser.loads(bibtex_str, parser=parser)
-
-                    created_count = 0
-                    skipped_count = 0
-                    failed_entries = []
-
-                    for entry in bib_database.entries:
-                        # Normaliza os campos para minúsculas para facilitar o acesso
-                        entry = {k.lower(): v for k, v in entry.items()}
-
-                        title = entry.get('title')
-                        if not title:
-                            failed_entries.append(f"Entrada sem título: {entry.get('id', 'ID desconhecido')}")
-                            continue
-
-                        # --- Lógica para Evento e Edição ---
-                        event_name = entry.get('journal') or entry.get('booktitle')
-                        year_str = entry.get('year')
-
-                        if not event_name or not year_str:
-                            failed_entries.append(f"Artigo '{title}' sem 'journal'/'booktitle' ou 'year'.")
-                            continue
-                        
-                        try:
-                            year = int(year_str)
-                        except ValueError:
-                            failed_entries.append(f"Artigo '{title}' com ano inválido: '{year_str}'.")
-                            continue
-
-                        # Encontra ou cria o Evento
-                        event, _ = Event.objects.get_or_create(
-                            name=event_name,
-                            defaults={
-                                'acronym': "".join(word[0] for word in event_name.split()[:4]).upper(),
-                                'full_description': f"Evento '{event_name}' criado automaticamente via importação BibTeX."
-                            }
-                        )
-
-                        # Encontra ou cria a Edição
-                        edition, _ = Edition.objects.get_or_create(
-                            event=event,
-                            start_date=date(year, 1, 1), # Data padrão para o ano
-                            defaults={
-                                'location': 'A definir',
-                                'end_date': date(year, 12, 31)
-                            }
-                        )
-                        
-                        # --- Lógica para Artigo ---
-                        # Verifica se o artigo já existe para evitar duplicatas
-                        if Article.objects.filter(title__iexact=title, edition=edition).exists():
-                            skipped_count += 1
-                            continue
-
-                        # Formata os autores
-                        authors_list = entry.get('author', '').replace('\n', ' ').split(' and ')
-                        authors_str = ", ".join(authors_list)
-                        
-                        # Formata as palavras-chave
-                        keywords_str = entry.get('keywords', '')
-
-                        # Cria o Artigo
-                        Article.objects.create(
-                            title=title,
-                            authors=authors_str,
-                            keywords=keywords_str,
-                            abstract=entry.get('abstract', ''),
-                            edition=edition,
-                            submitter=request.user # Associa o artigo ao admin que fez o upload
-                        )
-                        created_count += 1
-
-                    # --- Feedback para o Administrador ---
-                    if created_count > 0:
-                        self.message_user(request, f"{created_count} artigo(s) importado(s) com sucesso.", messages.SUCCESS)
-                    if skipped_count > 0:
-                        self.message_user(request, f"{skipped_count} artigo(s) já existiam e foram ignorados.", messages.INFO)
-                    if failed_entries:
-                        self.message_user(request, f"Falha ao importar {len(failed_entries)} entradas. Detalhes: {'; '.join(failed_entries)}", messages.ERROR)
-                    if created_count == 0 and skipped_count == 0 and not failed_entries:
-                         self.message_user(request, "Nenhum novo artigo encontrado no arquivo.", messages.WARNING)
-
-                    return redirect('admin:articles_article_changelist')
-
-                except Exception as e:
-                    self.message_user(request, f"Ocorreu um erro crítico ao processar o arquivo BibTeX: {e}", messages.ERROR)
-        else:
-            form = BibtexUploadForm()
+        ArticleFormSet = formset_factory(ArticlePreviewForm, extra=0)
         
+        if request.method == 'POST':
+            # Etapa 2: Processando o formulário de revisão que o usuário submeteu
+            if 'confirm_import' in request.POST:
+                formset = ArticleFormSet(request.POST)
+                if formset.is_valid():
+                    created_count = 0
+                    with transaction.atomic():
+                        for form_data in formset.cleaned_data:
+                            if form_data.get('import_this'):
+                                title = form_data.get('title')
+                                event_name = form_data.get('booktitle')
+                                year_str = form_data.get('year')
+                                edition = None
+                                
+                                if event_name and year_str:
+                                    try:
+                                        year = int(year_str)
+                                        event, _ = Event.objects.get_or_create(name=event_name, defaults={'acronym': "".join(word[0] for word in event_name.split()[:4]).upper()})
+                                        edition, _ = Edition.objects.get_or_create(event=event, start_date=date(year, 1, 1), defaults={'location': form_data.get('location', 'A definir'), 'end_date': date(year, 12, 31)})
+                                    except (ValueError, TypeError):
+                                        continue
+                                
+                                if not Article.objects.filter(title__iexact=title, edition=edition).exists():
+                                    Article.objects.create(
+                                        title=title,
+                                        authors=form_data.get('authors'),
+                                        keywords=form_data.get('keywords', ''),
+                                        abstract=form_data.get('abstract', ''),
+                                        pages=form_data.get('pages', ''),
+                                        location=form_data.get('location', ''),
+                                        publisher=form_data.get('publisher', ''),
+                                        edition=edition,
+                                        submitter=request.user
+                                    )
+                                    created_count += 1
+
+                    self.message_user(request, f"{created_count} artigo(s) importado(s) com sucesso.")
+                    return redirect('admin:articles_article_changelist')
+                else:
+                    # --- CORREÇÃO: Re-renderizar a página de preview com os erros ---
+                    # Em vez de redirecionar, mostramos o formulário novamente para que o usuário possa corrigir.
+                    reconstructed_data_for_template = []
+                    for form in formset:
+                        # Recria o dicionário 'initial' para o template a partir dos dados do POST
+                        data_dict = {key.split('-')[-1]: value for key, value in form.data.items() if key.startswith(form.prefix)}
+                        # Adiciona os erros de validação específicos deste formulário ao dicionário
+                        data_dict['validation_errors'] = [msg for error_list in form.errors.values() for msg in error_list]
+                        reconstructed_data_for_template.append(data_dict)
+
+                    messages.error(request, "Por favor, corrija os erros nos artigos selecionados antes de continuar.")
+
+                    context = self.admin_site.each_context(request)
+                    context['opts'] = self.model._meta
+                    context['title'] = "Revisar Artigos para Importação"
+                    context['formset'] = formset # O formset com os erros
+                    context['parsing_errors'] = []
+                    # Combina o formset (com erros) e os dados reconstruídos para o template
+                    context['initial_data_with_errors'] = zip(formset, reconstructed_data_for_template)
+                    return render(request, "admin/articles/bulk_upload_preview.html", context)
+            
+            # Etapa 1: Processando o upload inicial do BibTeX
+            else:
+                form = BibtexUploadForm(request.POST, request.FILES)
+                if form.is_valid():
+                    bibtex_file = form.cleaned_data.get('bibtex_file')
+                    bibtex_text = form.cleaned_data.get('bibtex_text')
+                    bibtex_str = bibtex_file.read().decode('utf-8') if bibtex_file else bibtex_text
+                    
+                    initial_data = []
+                    parsing_errors = []
+                    try:
+                        bib_database = bibtexparser.loads(bibtex_str, parser=BibTexParser(common_strings=True))
+                        for entry in bib_database.entries:
+                            entry_data = {k.lower(): v for k, v in entry.items()}
+                            
+                            data_for_form = {
+                                'title': entry_data.get('title', ''),
+                                'authors': ' and '.join(entry_data.get('author', '').replace('\n', ' ').split(' and ')),
+                                'year': entry_data.get('year', ''),
+                                'booktitle': entry_data.get('journal', '') or entry_data.get('booktitle', ''),
+                                'keywords': entry_data.get('keywords', ''),
+                                'abstract': entry_data.get('abstract', ''),
+                                'pages': entry_data.get('pages', ''),
+                                'location': entry_data.get('location', ''),
+                                'publisher': entry_data.get('publisher', ''),
+                                'validation_errors': []
+                            }
+
+                            if not data_for_form['title']: data_for_form['validation_errors'].append("Título é obrigatório.")
+                            if not data_for_form['authors']: data_for_form['validation_errors'].append("Autores são obrigatórios.")
+                            if not data_for_form['year']: data_for_form['validation_errors'].append("Ano é obrigatório.")
+                            if not data_for_form['booktitle']: data_for_form['validation_errors'].append("Journal/Booktitle é obrigatório.")
+                            
+                            data_for_form['import_this'] = not data_for_form['validation_errors']
+                            initial_data.append(data_for_form)
+
+                    except Exception as e:
+                        parsing_errors.append(f"Erro crítico ao processar o BibTeX: {e}")
+
+                    formset = ArticleFormSet(initial=[d for d in initial_data])
+                    context = self.admin_site.each_context(request)
+                    context['opts'] = self.model._meta
+                    context['title'] = "Revisar Artigos para Importação"
+                    context['formset'] = formset
+                    context['parsing_errors'] = parsing_errors
+                    context['initial_data_with_errors'] = zip(formset, initial_data)
+                    return render(request, "admin/articles/bulk_upload_preview.html", context)
+                # Se o formulário inicial for inválido, a execução continua para baixo, onde o formulário com erros será renderizado.
+
+        # Este bloco lida com requisições GET ou com POSTs inválidos da Etapa 1
+        form = BibtexUploadForm() if request.method == 'GET' else form
+
         context = self.admin_site.each_context(request)
         context['opts'] = self.model._meta
         context['title'] = "Importar Artigos em Massa (BibTeX)"

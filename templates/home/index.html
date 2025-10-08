@@ -26,9 +26,21 @@
         {% if recent_articles %}
             <div class="space-y-4">
                 {% for article in recent_articles %}
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-300">
-                        <h3 class="text-lg font-semibold text-blue-700">{{ article.title }}</h3>
-                        <p class="text-sm text-gray-500 mt-1">por {{ article.authors|truncatechars:80 }}</p>
+                    {# --- CORREÇÃO: O card agora é um <div>, não um link --- #}
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-md hover:border-blue-300 transition-all duration-300">
+                        {# Link apenas no título do artigo #}
+                        <h3 class="text-lg font-semibold">
+                            <a href="{% url 'articles:article-detail' article.id %}" class="text-blue-700 hover:underline">{{ article.title }}</a>
+                        </h3>
+                        
+                        {# Links individuais para cada autor #}
+                        <p class="text-sm text-gray-500 mt-1">
+                            por
+                            {% for author in article.author_list %}
+                                <a href="{% url 'articles:author-detail' author_name=author|urlencode %}" class="text-gray-600 hover:underline">{{ author }}</a>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        
                         {% if article.abstract %}
                             <p class="text-sm text-gray-600 mt-2">{{ article.abstract|truncatewords:25 }}</p>
                         {% endif %}

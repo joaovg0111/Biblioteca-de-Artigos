@@ -1,0 +1,373 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+{% load my_template_tags %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+    /* Estilos da Tabela */
+    #article-preview-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #ddd;
+        margin-top: 1rem;
+        background-color: #fff;
+    }
+    #article-preview-table th, #article-preview-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+        color: #333;
+    }
+    #article-preview-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        text-transform: uppercase;
+        font-size: 0.85em;
+    }
+    
+    /* Linha de Resumo (Principal) */
+    .article-summary-row { transition: background-color 0.2s; }
+    .article-summary-row:hover { background-color: #fdfdfd; }
+    .article-summary-row.has-errors {
+        border-left: 4px solid #ba2121;
+        background-color: #fff8f8;
+    }
+    
+    /* Linha de Detalhes (Expansível) */
+    .article-details-row td {
+        background-color: #fafafa;
+        padding: 20px;
+        border-top: none;
+        box-shadow: inset 0 4px 6px -4px rgba(0,0,0,0.1);
+    }
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    /* Campos Editáveis */
+    .editable-field { position: relative; }
+    .editable-field label {
+        font-weight: 600;
+        color: #555;
+        display: block;
+        font-size: 0.85em;
+        margin-bottom: 6px;
+    }
+    .display-value {
+        padding: 8px 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        min-height: 38px;
+        display: block;
+        background-color: #fff;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* Ícones e Botões */
+    .edit-field-btn {
+        position: absolute;
+        right: 10px;
+        top: 32px;
+        background: none; border: none; cursor: pointer;
+        color: #a0aec0;
+        padding: 2px;
+        opacity: 0;
+        transition: opacity 0.2s, color 0.2s;
+    }
+    .editable-field:hover .edit-field-btn { opacity: 1; }
+    .edit-field-btn:hover { color: #2d3748; }
+    
+    .expand-btn {
+        background: none; border: none; cursor: pointer;
+        padding: 6px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: #718096;
+        transition: transform 0.3s ease, background-color 0.2s, color 0.2s;
+        /* margin: auto; */ /* Removido para alinhar à direita */
+    }
+    .expand-btn:hover { background-color: #edf2f7; color: #4a5568; }
+    .expand-btn.is-expanded { transform: rotate(180deg); }
+    .expand-btn svg, .edit-field-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* Formulários e Erros */
+    .vTextField, .vLargeTextField {
+        width: 100%; box-sizing: border-box;
+        border: 1px solid #3b82f6; box-shadow: 0 0 0 1px #3b82f6;
+        border-radius: 6px; padding: 8px 10px;
+    }
+    .vLargeTextField { min-height: 80px; }
+    .errorlist { color: #e53e3e; margin: 0 0 1rem 0; padding-left: 1.2rem; font-size: 0.9em; }
+
+    /* --- Dark Mode Overrides --- */
+    html.dark #article-preview-table {
+        border-color: #4b5563;
+        background-color: var(--dark-panel-bg, #334155);
+    }
+    html.dark #article-preview-table th, 
+    html.dark #article-preview-table td {
+        border-bottom-color: #4b5563;
+        color: var(--dark-fg, #cbd5e1);
+    }
+    html.dark #article-preview-table th {
+        background-color: #475569;
+        color: #f1f5f9;
+    }
+    html.dark .article-summary-row:hover {
+        background-color: var(--dark-highlight, #4a5a70);
+    }
+    html.dark .article-summary-row.has-errors {
+        border-left-color: #f87171;
+        background-color: #5f2b2b;
+    }
+    html.dark .article-details-row td {
+        background-color: var(--dark-bg, #1e293b);
+        box-shadow: inset 0 4px 6px -4px rgba(0,0,0,0.4);
+    }
+    html.dark .editable-field label {
+        color: var(--dark-fg, #cbd5e1);
+    }
+    html.dark .display-value {
+        background-color: #475569;
+        border-color: #64748b;
+    }
+    html.dark .edit-field-btn {
+        color: #9ca3af;
+    }
+    html.dark .edit-field-btn:hover { color: #f9fafb; }
+    html.dark .expand-btn {
+        color: #9ca3af;
+    }
+    html.dark .expand-btn:hover {
+        background-color: #475569;
+        color: #f9fafb;
+    }
+    html.dark .errorlist {
+        color: #fca5a5;
+    }
+</style>
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a> &rsaquo; 
+<a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo; 
+<a href="{% url 'admin:articles_article_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo; 
+{{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ title }}</h1>
+
+    {% if parsing_errors %}<div class="errornote">{% for error in parsing_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+
+    {% if formset %}
+        <form method="post" id="preview-form">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            <input type="hidden" name="confirm_import" value="1">
+            <p>Revise os artigos abaixo. Clique na seta para ver detalhes e editar campos. Linhas vermelhas indicam erros.</p>
+
+            <table id="article-preview-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px; text-align: center;"><input type="checkbox" id="select-all-checkbox" title="Selecionar/Deselecionar Todos"></th>
+                        <th>Título</th>
+                        <th style="width: 25%;">Autores</th>
+                        <th style="width: 80px;">Ano</th>
+                        <th style="width: 20%;">Journal/Booktitle</th>
+                    </tr>
+                </thead>
+                {% for form, initial in initial_data_with_errors %}
+                <tbody class="article-group">
+                    <tr class="article-summary-row {% if initial.validation_errors %}has-errors{% endif %}">
+                        <td style="text-align: center;">{{ form.import_this }}</td>
+                        <td class="field-summary-title font-semibold">{{ initial.title|default:"-"|truncatechars:100 }}</td>
+                        <td class="field-summary-authors text-gray-600">{{ initial.authors|default:"-"|truncatechars:50 }}</td>
+                        <td class="field-summary-year">{{ initial.year|default:"-" }}</td>
+                        <td class="field-summary-booktitle text-gray-600">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="flex-grow">{{ initial.booktitle|default:"-"|truncatechars:40 }}</span>
+                                <button type="button" class="expand-btn flex-shrink-0" title="Expandir/Recolher Detalhes">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="article-details-row" style="display: none;">
+                        <td colspan="5">
+                            {% if initial.validation_errors %}
+                                <ul class="errorlist">{% for error in initial.validation_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                            {% else %}
+                                <ul class="errorlist" style="display: none;"></ul>
+                            {% endif %}
+                            
+                            <div class="details-grid">
+                                {% for field in form.visible_fields %}
+                                    {% if field.name != 'import_this' %}
+                                    <div class="editable-field">
+                                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                        <div class="display-value">
+                                            {{ initial|dict_get:field.name|default:"-"|linebreaksbr }}
+                                        </div>
+                                        <button type="button" class="edit-field-btn" aria-label="Editar {{ field.label }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
+                                        </button>
+                                        {{ field }}
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                {% endfor %}
+            </table>
+
+            <div class="submit-row">
+                <input type="submit" value="Importar Selecionados" class="default">
+                <a href="{% url 'admin:articles_article_changelist' %}" class="button">Cancelar</a>
+            </div>
+        </form>
+    {% else %}
+        <div class="module" style="padding: 20px; text-align: center;">
+            <p style="font-size: 1.1em; color: #666;">Nenhum artigo válido foi encontrado no conteúdo fornecido.</p>
+            <div style="margin-top: 15px;">
+                <a href="{% url 'admin:articles_article_bulk_upload' %}" class="button default">Voltar e Tentar Novamente</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.article-group').forEach(group => {
+        const summaryRow = group.querySelector('.article-summary-row');
+        const detailsRow = group.querySelector('.article-details-row');
+        const expandBtn = summaryRow.querySelector('.expand-btn');
+        const errorList = group.querySelector('.errorlist');
+        const importCheckbox = summaryRow.querySelector('input[name$="-import_this"]');
+
+        const validationRules = {
+            'title': 'Título é obrigatório.',
+            'authors': 'Autores são obrigatórios.',
+            'year': 'Ano é obrigatório.',
+            'booktitle': 'Journal/Booktitle é obrigatório.'
+        };
+
+        expandBtn.addEventListener('click', () => {
+            const isHidden = detailsRow.style.display === 'none';
+            detailsRow.style.display = isHidden ? 'table-row' : 'none';
+            expandBtn.classList.toggle('is-expanded', isHidden);
+        });
+
+        function updateErrorState() {
+            const hasErrors = errorList.children.length > 0;
+            summaryRow.classList.toggle('has-errors', hasErrors);
+            importCheckbox.checked = !hasErrors;
+            errorList.style.display = hasErrors ? 'block' : 'none';
+        }
+
+        function validateField(input, fieldName) {
+            if (!validationRules[fieldName]) return;
+            const errorMessage = validationRules[fieldName];
+            let errorLi = Array.from(errorList.children).find(li => li.textContent === errorMessage);
+
+            if (input.value.trim() === '') {
+                if (!errorLi) {
+                    errorLi = document.createElement('li');
+                    errorLi.textContent = errorMessage;
+                    errorList.appendChild(errorLi);
+                }
+            } else if (errorLi) {
+                errorLi.remove();
+            }
+            updateErrorState();
+        }
+
+        detailsRow.querySelectorAll('.editable-field').forEach(fieldContainer => {
+            const displayValue = fieldContainer.querySelector('.display-value');
+            const formInput = fieldContainer.querySelector('input, textarea');
+            const editBtn = fieldContainer.querySelector('.edit-field-btn');
+
+            if (!formInput || !editBtn) return;
+
+            formInput.style.display = 'none';
+            const fieldName = formInput.name.split('-').pop();
+
+            function switchToEdit() {
+                displayValue.style.display = 'none';
+                formInput.style.display = 'block';
+                formInput.focus();
+                if (formInput.tagName.toLowerCase() !== 'textarea') {
+                    formInput.select();
+                }
+            }
+            
+            editBtn.addEventListener('click', switchToEdit);
+            
+            function saveAndSwitchToDisplay() {
+                formInput.style.display = 'none';
+                displayValue.style.display = 'block';
+                
+                const newValue = formInput.value.trim() || '-';
+                if (formInput.tagName.toLowerCase() === 'textarea') {
+                    displayValue.innerHTML = newValue.replace(/\n/g, '<br>');
+                } else {
+                    displayValue.textContent = newValue;
+                }
+                
+                const summaryCell = summaryRow.querySelector(`.field-summary-${fieldName} span`);
+                if (summaryCell) {
+                    let truncatedValue = newValue;
+                    if (fieldName === 'title' && newValue.length > 100) truncatedValue = newValue.substring(0, 100) + '...';
+                    if (fieldName === 'authors' && newValue.length > 50) truncatedValue = newValue.substring(0, 50) + '...';
+                    if (fieldName === 'booktitle' && newValue.length > 40) truncatedValue = newValue.substring(0, 40) + '...';
+                    summaryCell.textContent = truncatedValue;
+                }
+
+                validateField(formInput, fieldName);
+            }
+
+            // CORREÇÃO: Função saveAndSwitchToDisplay é chamada nos dois eventos
+            formInput.addEventListener('blur', saveAndSwitchToDisplay);
+            
+            formInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' && formInput.tagName.toLowerCase() !== 'textarea') {
+                    event.preventDefault();
+                    formInput.blur(); // Dispara o evento 'blur' para salvar
+                } else if (event.key === 'Escape') {
+                    formInput.blur(); // Opcional: Esc também salva
+                }
+            });
+
+            // Valida o estado inicial ao carregar a página
+            validateField(formInput, fieldName);
+        });
+    });
+
+    const selectAllCb = document.getElementById('select-all-checkbox');
+    if (selectAllCb) {
+        selectAllCb.addEventListener('change', function(event) {
+            const isChecked = event.target.checked;
+            document.querySelectorAll('.article-group').forEach(group => {
+                const checkbox = group.querySelector('input[name$="-import_this"]');
+                const hasErrors = group.querySelector('.article-summary-row').classList.contains('has-errors');
+                if (!hasErrors || !isChecked) {
+                    checkbox.checked = isChecked;
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

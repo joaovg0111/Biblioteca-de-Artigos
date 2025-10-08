@@ -19,7 +19,13 @@ def home_view(request):
     Exibe a página inicial, incluindo uma lista dos 5 artigos mais recentes.
     """
     recent_articles = Article.objects.order_by('-created_at')[:3]
-    recent_events = Event.objects.order_by('-id')[:4]  # Pega os 4 eventos mais recentes
+    recent_events = Event.objects.order_by('-id')[:4]
+
+    # --- MUDANÇA: Preparamos a lista de autores para cada artigo ---
+    for article in recent_articles:
+        # Divide a string de autores por vírgula e remove espaços extras
+        article.author_list = [name.strip() for name in article.authors.split(',') if name.strip()]
+
     context = {
         'recent_articles': recent_articles,
         'recent_events': recent_events,
@@ -50,19 +56,32 @@ def article_list_view(request):
 
 def article_search_view(request):
     query = request.GET.get('q')
+    search_field = request.GET.get('search_field', 'title') # Default to 'title'
     articles = Article.objects.none()
+    field_display_name = ''
 
     if query:
-        articles = Article.objects.filter(
-            Q(title__icontains=query) |
-            Q(authors__icontains=query) |  # <-- Buscando em um campo de texto
-            Q(edition__event__name__icontains=query) |
-            Q(edition__event__acronym__iexact=query)
-        ).distinct()
+        # Build the query based on the selected field
+        if search_field == 'title':
+            query_filter = Q(title__icontains=query)
+            field_display_name = "Título"
+        elif search_field == 'author':
+            query_filter = Q(authors__icontains=query)
+            field_display_name = "Autor"
+        elif search_field == 'event':
+            query_filter = Q(edition__event__name__icontains=query) | Q(edition__event__acronym__icontains=query)
+            field_display_name = "Evento"
+        else: # Fallback to title search if an invalid field is provided
+            query_filter = Q(title__icontains=query)
+            field_display_name = "Título"
+
+        articles = Article.objects.filter(query_filter).distinct()
 
     context = {
         'query': query,
-        'articles': articles
+        'articles': articles,
+        'search_field': search_field, # Pass this back to the template
+        'field_display_name': field_display_name
     }
     return render(request, 'articles/article_search_results.html', context)
 
