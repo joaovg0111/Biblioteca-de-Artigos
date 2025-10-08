@@ -167,7 +167,8 @@ graph TD
 
     subgraph "Processo em Segundo Plano"
         style S fill:#f9f,stroke:#333,stroke-width:2px
-        Q -- Cria novo artigo --> S{Sinal (Signal) disparado};
+        S{Sinal (Signal) disparado}
+        Q -- Cria novo artigo --> S;
         R -- Cria novo artigo --> S;
         S --> T[Compara palavras-chave do artigo com interesses];
         T --> U{Há correspondência?};
