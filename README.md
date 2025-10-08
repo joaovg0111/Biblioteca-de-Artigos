@@ -68,23 +68,30 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 - Desenvolver as páginas públicas para visualização dos eventos. – **[Membro]**
 - Desenvolver as páginas públicas para visualização das edições. – **[João Vitor]**
 
-### História 2: Como usuário, eu quero pesquisar artigos por título, autor e nome do evento.
-- Implementar a interface da barra de busca no frontend. – **[Membro]**
-- Desenvolver a lógica de busca no backend para consultar o banco de dados. – **[Leonardo]**
-- Criar a página de exibição dos resultados da busca. – **[Leonardo]**
-
-### História 3: Como usuário, eu quero ter uma home page com os meus artigos, organizados por ano.
-- Implementar a lógica no backend para filtrar os artigos do usuário logado. – **[Membro]**
-- Desenvolver a funcionalidade de agrupar os artigos por ano de publicação. – **[Membro]**
-- Criar a interface da página "Meus Artigos" para exibir os resultados. – **[João Vitor]**
-- Adicionar o link de acesso à página no menu do usuário. – **[João Vitor]**
-
 ### História 4: Como administrador, eu quero cadastrar artigos em massa a partir de um arquivo BibTeX.
 - Criar a interface de upload de arquivos no painel de administração. – **[João Vitor]**
 - Implementar a lógica no backend para ler e interpretar o arquivo BibTeX. – **[João Vitor]**
 - Desenvolver a funcionalidade para criar ou associar eventos e edições automaticamente. – **[João Vitor]**
 - Implementar a criação dos artigos no banco de dados e fornecer feedback ao administrador. – **[João Vitor]**
 - Implementar a funcionalidade de leitura e integração de arquivos PDF e .bib contidos em um arquivo .zip. **[Seungbin Han]**
+
+### História 5: Como usuário, eu quero pesquisar artigos por título, autor e nome do evento.
+- Implementar a interface da barra de busca no frontend. – **[Membro]**
+- Desenvolver a lógica de busca no backend para consultar o banco de dados. – **[Leonardo]**
+- Criar a página de exibição dos resultados da busca. – **[Leonardo]**
+
+### História 6: Como administrador, eu quero que todo evento tenha uma home page, com suas edições; cada edição, por sua vez, também deve ter uma home page, com seus artigos. 
+- Criar URLs dinâmicas para capturar o acrônimo do evento e o ID da edição. – **[Leonardo]**
+- Desenvolver a lógica de busca no backend para consultar o banco de dados. – **[Leonardo]**
+- Desenvolver as páginas HTML para exibir as informações de forma clara para o usuário, mantendo o estilo visual do site. – **[Leonardo]**
+- Garantir que os links em todo o site apontem para as novas páginas corretamente. – **[Leonardo]**
+
+### História 7: Como usuário, eu quero ter uma home page com os meus artigos, organizados por ano.
+- Implementar a lógica no backend para filtrar os artigos do usuário logado. – **[Membro]**
+- Desenvolver a funcionalidade de agrupar os artigos por ano de publicação. – **[Membro]**
+- Criar a interface da página "Meus Artigos" para exibir os resultados. – **[João Vitor]**
+- Adicionar o link de acesso à página no menu do usuário. – **[João Vitor]**
+
 
 ---
 
