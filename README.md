@@ -69,7 +69,7 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 - Desenvolver as páginas públicas para visualização das edições. – **[João Vitor]**
 
 ### História 2: Como usuário, eu quero pesquisar artigos por título, autor e nome do evento.
-- Implementar a interface da barra de busca no frontend. – **[Membro]**
+- Implementar a interface da barra de busca no frontend. – **[Seungbin]**
 - Desenvolver a lógica de busca no backend para consultar o banco de dados. – **[Leonardo]**
 - Criar a página de exibição dos resultados da busca. – **[Leonardo]**
 
