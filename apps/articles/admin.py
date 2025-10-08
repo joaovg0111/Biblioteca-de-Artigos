@@ -67,23 +67,41 @@ class ArticleAdmin(admin.ModelAdmin):
                         entry = {k.lower(): v for k, v in entry.items()}
                         entry_key = entry.get('id') # Ex: 'sbes-paper1'
 
+                        # --- MUDANÇA: Lógica de validação com flag e coleta de todos os erros ---
+                        is_valid = True
+                        entry_errors = []
+
                         title = entry.get('title')
                         if not title:
-                            skipped_articles.append((f"ID: {entry.get('id', 'desconhecido')}", "Título não encontrado."))
-                            continue
-
-                        # --- Lógica para Evento e Edição ---
-                        event_name = entry.get('journal') or entry.get('booktitle')
-                        year_str = entry.get('year')
+                            is_valid = False
+                            entry_errors.append("Título não encontrado.")
                         
-                        if not event_name or not year_str:
-                            skipped_articles.append((title, "Faltando 'journal'/'booktitle' ou 'year'."))
+                        # Identificador para o relatório de erros, mesmo se o título faltar
+                        entry_identifier = title or f"ID: {entry_key or 'desconhecido'}"
+
+                        event_name = entry.get('journal') or entry.get('booktitle')
+                        if not event_name:
+                            is_valid = False
+                            entry_errors.append("Campo 'journal' ou 'booktitle' não encontrado.")
+
+                        year_str = entry.get('year')
+                        year = None
+                        if not year_str:
+                            is_valid = False
+                            entry_errors.append("Campo 'year' não encontrado.")
+                        else:
+                            try:
+                                year = int(year_str)
+                            except ValueError:
+                                is_valid = False
+                                entry_errors.append(f"Ano inválido: '{year_str}'.")
+
+                        # Se houver erros de validação, agrupa-os e pula para a próxima entrada
+                        if not is_valid:
+                            combined_errors = ", ".join(entry_errors)
+                            skipped_articles.append((entry_identifier, combined_errors))
                             continue
-                        try:
-                            year = int(year_str)
-                        except ValueError:
-                            skipped_articles.append((title, f"Ano inválido: '{year_str}'."))
-                            continue
+                        # --- Fim da MUDANÇA na validação ---
 
                         # Encontra ou cria o Evento
                         event, _ = Event.objects.get_or_create(
