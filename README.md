@@ -137,41 +137,41 @@ classDiagram
 Este fluxograma descreve o fluxo geral de interações do usuário com a plataforma, desde a navegação básica até as funcionalidades administrativas e processos automatizados.
 
 ```mermaid
-graph TD
-    subgraph "Papéis do Usuário"
-        A[Início: Visitar o site] --> B{Está logado?};
-        B -- Não (Visitante) --> C[Funcionalidades do Visitante];
-        B -- Sim --> D{É conta de administrador?};
-        D -- Não (Usuário Comum) --> E[Funcionalidades do Usuário Logado];
-        D -- Sim (Administrador) --> F[Funcionalidades do Administrador];
-    end
+flowchart TD
+  subgraph Papeis do Usuario
+    A[Inicio: Visitar o site] --> B{Esta logado?}
+    B -->|Nao - Visitante| C[Funcionalidades do Visitante]
+    B -->|Sim| D{Conta de administrador?}
+    D -->|Nao - Usuario comum| E[Funcionalidades do Usuario logado]
+    D -->|Sim - Administrador| F[Funcionalidades do Administrador]
+  end
 
-    subgraph "Funcionalidades Comuns"
-        C --> H[Pesquisar/Listar Artigos];
-        H --> H1[Ver Detalhes do Artigo e Baixar PDF];
-        C --> I[Listar Eventos e Edições];
-        I --> I1[Ver Artigos por Edição];
-    end
+  subgraph Funcionalidades Comuns
+    C --> H[Pesquisar / Listar Artigos]
+    H --> H1[Ver Detalhes do Artigo e Baixar PDF]
+    C --> I[Listar Eventos e Edicoes]
+    I --> I1[Ver Artigos por Edicao]
+  end
 
-    subgraph "Funcionalidades do Usuário Logado"
-        E --> M[Gerenciar Interesses para Notificação];
-        E --> L[Visualizar 'Meus Artigos'];
-    end
+  subgraph Funcionalidades do Usuario Logado
+    E --> M[Gerenciar Interesses para Notificacao]
+    E --> L[Visualizar Meus Artigos]
+  end
 
-    subgraph "Funcionalidades do Administrador"
-        F --> O[Acessar Painel Admin];
-        O --> P[Gerenciar Eventos/Edições];
-        O --> Q[Gerenciar Artigos Individualmente];
-        O --> R[Importação em Massa via BibTeX];
-    end
+  subgraph Funcionalidades do Administrador
+    F --> O[Acessar Painel Admin]
+    O --> P[Gerenciar Eventos / Edicoes]
+    O --> Q[Gerenciar Artigos Individualmente]
+    O --> R[Importacao em Massa via BibTeX]
+  end
 
-    subgraph "Processo em Segundo Plano"
-        style S fill:#f9f,stroke:#333,stroke-width:2px
-        S{Sinal (Signal) disparado}
-        Q -- Cria novo artigo --> S;
-        R -- Cria novo artigo --> S;
-        S --> T[Compara palavras-chave do artigo com interesses];
-        T --> U{Há correspondência?};
-        U -- Sim --> V[Envia e-mail de notificação];
-    end
+  subgraph Processo em Segundo Plano
+    S[Sinal disparado]
+    Q -->|Cria novo artigo| S
+    R -->|Cria novo artigo| S
+    S --> T[Compara palavras-chave do artigo com interesses]
+    T --> U[Ha correspondencia?]
+    U -->|Sim| V[Envia email de notificacao]
+    style S fill:#f9f,stroke:#333,stroke-width:2px
+  end
 ```
