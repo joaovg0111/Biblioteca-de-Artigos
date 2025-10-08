@@ -175,4 +175,8 @@ flowchart TD
     U -->|Sim| V[Envia email de notificacao]
     style S fill:#f9f,stroke:#333,stroke-width:2px
   end
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> f0c6e9a (entrega final)
