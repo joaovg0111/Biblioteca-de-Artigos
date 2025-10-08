@@ -4,18 +4,18 @@
 
 {% block content %}
 <div class="border-b pb-4 mb-6">
-    <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-200">Meus Artigos</h1>
-    <p class="text-lg text-gray-600 dark:text-gray-400 mt-2">Aqui estão todos os artigos que você enviou para a biblioteca.</p>
+    <h1 class="text-4xl font-bold text-gray-800">Meus Artigos</h1>
+    <p class="text-lg text-gray-600 mt-2">Aqui estão todos os artigos que você enviou para a biblioteca.</p>
 </div>
 
 {% for year, articles in articles_by_year.items %}
     <div class="mb-10">
-        <h2 class="text-3xl font-semibold text-gray-700 dark:text-gray-300 border-b-2 border-indigo-200 dark:border-gray-700 pb-2 mb-4">{{ year }}</h2>
+        <h2 class="text-3xl font-semibold text-gray-700 border-b-2 border-indigo-200 pb-2 mb-4">{{ year }}</h2>
         <div class="space-y-6">
             {% for article in articles %}
-                <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
-                    <a href="{% url 'articles:article-detail' article.id %}" class="text-xl text-blue-700 dark:text-blue-400 hover:underline">{{ article.title }}</a>
-                    <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <div class="border-b border-gray-200 pb-4">
+                    <a href="{% url 'articles:article-detail' article.id %}" class="text-xl text-blue-700 hover:underline">{{ article.title }}</a>
+                    <div class="mt-1 text-sm text-gray-600">
                         <p><strong>Autores:</strong> {{ article.authors }}</p>
                         <p><strong>Edição:</strong> {{ article.edition }}</p>
                         <p><strong>Enviado em:</strong> {{ article.created_at|date:"d/m/Y" }}</p>
@@ -29,8 +29,8 @@
         </div>
     </div>
 {% empty %}
-    <div class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <p class="text-gray-500 dark:text-gray-400 text-lg">Você ainda não enviou nenhum artigo.</p>
+    <div class="text-center py-12 bg-gray-50 rounded-lg">
+        <p class="text-gray-500 text-lg">Você ainda não enviou nenhum artigo.</p>
         {% if user.is_staff %}
             <a href="{% url 'articles:add-article-options' %}" class="mt-4 inline-block bg-[#003366] text-white px-5 py-2 rounded-md font-medium hover:bg-[#002244] transition duration-300">
                 Adicionar seu primeiro artigo

@@ -1,0 +1,111 @@
+<!-- CRIE ESTE NOVO ARQUIVO EM: templates/admin/articles/bulk_upload_report.html -->
+
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+    .report-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .report-section h2 {
+        margin-top: 0;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 0.5rem;
+    }
+    .report-section ul {
+        list-style-type: disc;
+        padding-left: 20px;
+    }
+    .report-section table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .report-section th, .report-section td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:articles_article_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ title }}</h1>
+
+    <!-- Seção de Sucesso -->
+    {% if successful_articles %}
+    <div class="report-section">
+        <h2>✅ {{ successful_articles|length }} Artigo(s) Importado(s) com Sucesso</h2>
+        <ul>
+            {% for article in successful_articles %}
+                <li>
+                    <a href="{% url 'admin:articles_article_change' article.pk %}">{{ article.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Seção de Ignorados -->
+    {% if skipped_articles %}
+    <div class="report-section">
+        <h2>ℹ️ {{ skipped_articles|length }} Artigo(s) Ignorado(s) (Já Existiam)</h2>
+        <ul>
+            {% for item in skipped_articles %}
+                <li>{{ item.title }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Seção de Falhas -->
+    {% if failed_entries %}
+    <div class.report-section">
+        <h2>❌ {{ failed_entries|length }} Entrada(s) com Falha</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID da Entrada / Item</th>
+                    <th>Motivo da Falha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for failure in failed_entries %}
+                    <tr>
+                        <td>{{ failure.id }}</td>
+                        <td>{{ failure.reason }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Mensagem se nada foi processado -->
+    {% if not successful_articles and not skipped_articles and not failed_entries %}
+        <p>Nenhuma entrada de artigo foi encontrada no conteúdo fornecido.</p>
+    {% endif %}
+    
+    <div class="submit-row">
+        <a href="{% url 'admin:articles_article_changelist' %}" class="button">Voltar para a Lista de Artigos</a>
+        <a href="{% url 'admin:articles_article_bulk_upload' %}" class="button default">Importar Mais Artigos</a>
+    </div>
+</div>
+{% endblock %}

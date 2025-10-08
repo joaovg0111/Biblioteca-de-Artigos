@@ -1,0 +1,52 @@
+{% load i18n admin_urls static %}
+
+<div class="js-inline-admin-formset inline-group" id="{{ inline_admin_formset.formset.prefix }}-group"
+     data-inline-type="tabular"
+     data-inline-formset="{{ inline_admin_formset.inline_formset_data }}">
+  <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
+    {{ inline_admin_formset.formset.management_form }}
+    <fieldset class="module {{ inline_admin_formset.classes }}">
+      <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+      {{ inline_admin_formset.formset.non_form_errors }}
+      <table>
+        <thead>
+          <tr>
+            {# --- MUDANÇA: O cabeçalho agora corresponde exatamente aos campos visíveis --- #}
+            <th class="column-edition_link">Edição</th>
+            <th class="column-location">Localização</th>
+            <th class="column-website">Website da Edição</th>
+            <th class="column-start_date">Data de Início</th>
+            <th class="column-end_date">Data de Fim</th>
+            <th class="column-remove-action">Ações</th> {# Cabeçalho para o botão de remover #}
+          </tr>
+        </thead>
+        <tbody>
+        {% for inline_admin_form in inline_admin_formset %}
+          {# --- MUDANÇA: Estrutura da linha simplificada para corrigir o alinhamento --- #}
+          <tr class="form-row {% if inline_admin_form.original %}has_original{% endif %}">
+            
+            {# Renderiza os campos somente leitura definidos no admin.py #}
+            {% for fieldset in inline_admin_form %}
+              {% for line in fieldset %}
+                {% for field in line %}
+                  <td class="{{ field.field.name }}">
+                      {{ field.contents }}
+                  </td>
+                {% endfor %}
+              {% endfor %}
+            {% endfor %}
+
+            {# Adiciona a célula com o botão de remover #}
+            <td class="delete">
+                {% if inline_admin_form.original.pk %}
+                  <a href="{% url 'admin:events_edition_delete' inline_admin_form.original.pk %}" class="button" style="background-color: #ba2121; color: white;">Remover</a>
+                {% endif %}
+            </td>
+
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </fieldset>
+  </div>
+</div>

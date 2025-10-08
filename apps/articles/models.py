@@ -24,9 +24,12 @@ class Article(models.Model):
 
     abstract = models.TextField("Resumo", blank=True)
     
-    # --- MUDANÇA: Novo campo para palavras-chave ---
-    # O usuário deve separar as palavras-chave por vírgula.
     keywords = models.CharField("Palavras-chave", max_length=255, blank=True, help_text="Separe as palavras-chave por vírgula")
+
+    # --- MUDANÇA: Novos campos para dados do BibTeX ---
+    pages = models.CharField("Páginas", max_length=50, blank=True)
+    location = models.CharField("Localização (BibTeX)", max_length=100, blank=True)
+    publisher = models.CharField("Publicador (BibTeX)", max_length=100, blank=True)
 
     pdf_file = models.FileField("Arquivo PDF", upload_to=article_upload_path, blank=True, null=True)
     original_filename = models.CharField("Nome Original do Arquivo", max_length=255, blank=True)

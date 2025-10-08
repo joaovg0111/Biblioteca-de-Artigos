@@ -3,7 +3,9 @@
 {% block title %}Resultados da Busca por "{{ query }}"{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-6 border-b pb-2">Resultados da busca por: <span class="text-blue-700">"{{ query }}"</span></h1>
+<h1 class="text-2xl font-bold mb-6 border-b pb-2">
+    Busca por <span class="text-blue-700">"{{ query }}"</span> em <span class="text-gray-500">{{ field_display_name }}</span>
+</h1>
 
 {% if articles %}
   <div class="space-y-6">
@@ -23,4 +25,4 @@
 {% else %}
   <p class="text-gray-500 mt-4">Nenhum artigo encontrado com os termos da sua busca.</p>
 {% endif %}
-{% endblock %}
+{% endblock %}/

@@ -9,7 +9,8 @@ class Event(models.Model):
     # --- MUDANÇA: Novo campo adicionado para a data principal do evento ---
     # null=True e blank=True permitem que eventos existentes não quebrem
     # e que a data seja opcional no painel de administração.
-    event_date = models.DateField("Data Principal do Evento", null=True, blank=True)
+    promoting_entity = models.CharField("Entidade Promotora", max_length=255, blank=True)
+
     
     website = models.URLField(max_length=255, blank=True, verbose_name="Website do Evento")
     full_description = models.TextField(verbose_name="Descrição Completa")

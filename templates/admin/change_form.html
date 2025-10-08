@@ -1,0 +1,30 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block footer %}
+    {# 1. Incluímos todo o conteúdo original do rodapé, para não perder nada. #}
+    {{ block.super }}
+
+    {# 2. Adicionamos nosso script seguro no final da página. #}
+    <script>
+        // Espera o documento carregar completamente para garantir que o botão já existe.
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Encontra o link de remoção pela sua classe CSS padrão do Django, '.deletelink'.
+            const deleteLink = document.querySelector('a.deletelink');
+            
+            // Verifica se o link de remoção realmente existe nesta página.
+            if (deleteLink) {
+                // Pega o nome do modelo (ex: "evento", "artigo") do contexto do template.
+                // 'escapejs' garante que o texto é seguro para ser usado em JavaScript.
+                const modelName = '{{ opts.verbose_name|escapejs }}';
+                
+                // Coloca a primeira letra em maiúscula para ficar gramaticalmente correto.
+                const capitalizedModelName = modelName.charAt(0).toUpperCase() + modelName.slice(1);
+                
+                // Finalmente, define o novo texto do botão.
+                deleteLink.textContent = `Remover ${capitalizedModelName}`;
+            }
+        });
+    </script>
+{% endblock %}
