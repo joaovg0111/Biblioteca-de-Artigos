@@ -90,6 +90,7 @@ As instruções detalhadas para configurar o ambiente de desenvolvimento, instal
 
 ## 🏛️ Arquitetura do Sistema (UML)
 
+```mermaid
 classDiagram
     class User {
         +string username
@@ -130,6 +131,7 @@ classDiagram
 
 ## 🗺️ Fluxograma do Sistema
 
+```mermaid
 graph TD
     subgraph "Papéis do Usuário"
         A[Início: Visitar o site] --> B{Está logado?};
