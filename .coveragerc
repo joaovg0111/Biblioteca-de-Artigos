@@ -1,0 +1,24 @@
+# CRIE ESTE ARQUIVO: .coveragerc
+
+[run]
+# Fonte dos seus apps
+source = apps
+
+# Exclui arquivos desnecessários do relatório
+omit =
+    */migrations/*
+    */apps.py
+    */__init__.py
+    */admin.py
+    */tests.py
+    */urls.py
+    */templatetags/*
+    manage.py
+    config/*
+
+[report]
+# Mostra as linhas que faltaram
+show_missing = True
+
+# Falha se a cobertura total for menor que 70%
+fail_under = 70

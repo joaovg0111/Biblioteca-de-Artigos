@@ -162,7 +162,7 @@ class ArticleAdmin(admin.ModelAdmin):
                     if created_count > 0:
                         # --- MUDANÇA: Mensagem de sucesso com títulos em negrito ---
                         success_details = [format_html("<strong>'{}'</strong>", escape(title)) for title in created_articles_titles]
-                        message_html = format_html("{} artigo(s) importado(s) com sucesso: {}", created_count, format_html("; ".join(success_details)))
+                        message_html = format_html("{} artigo(s) importado(s) com sucesso: {}", created_count, "; ".join(success_details))
                         messages.add_message(request, messages.SUCCESS, message_html, extra_tags='safe')
                     
                     if skipped_articles:
@@ -170,7 +170,7 @@ class ArticleAdmin(admin.ModelAdmin):
                         # Usamos format_html para construir uma string HTML segura.
                         # escape() garante que o título do artigo não seja interpretado como HTML.
                         skipped_messages = [format_html("<strong>'{}'</strong> (Motivo: <strong style='color: red;'>{}</strong>)", escape(title), escape(reason)) for title, reason in skipped_articles]
-                        message_html = format_html("{} artigo(s) foram ignorados. Detalhes: {}", len(skipped_articles), format_html("<br>".join(skipped_messages)))
+                        message_html = format_html("{} artigo(s) foram ignorados. Detalhes: {}", len(skipped_articles), "<br>".join(skipped_messages))
                         messages.add_message(request, messages.WARNING, message_html, extra_tags='safe')
 
                     if created_count == 0 and not skipped_articles:
