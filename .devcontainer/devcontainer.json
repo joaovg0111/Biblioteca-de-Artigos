@@ -24,7 +24,12 @@
                 "wholroyd.jinja",
                 // Dev productivity
                 "njpwerner.autodocstring",
-                "kevinrose.vsc-python-indent"
+                "kevinrose.vsc-python-indent",
+                // --- AI & Git tools ---
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "mhutchie.git-graph"
+
             ],
             "settings": {
                 "python.defaultInterpreterPath": "/usr/local/bin/python",
