@@ -13,15 +13,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',  # --- MUDANÇA: Adicione esta linha ---
+    'django.contrib.sites',
 
-    "apps.users",
-    "apps.events",
-    "apps.articles",
-    "apps.notifications",  # --- MUDANÇA: Adicione esta linha ---
+    'apps.users',
+    'apps.events',
+    'apps.articles',
+    'apps.notifications'
 ]
 
-# --- MUDANÇA: Adicione esta linha ---
 SITE_ID = 1
 
 MIDDLEWARE = [
