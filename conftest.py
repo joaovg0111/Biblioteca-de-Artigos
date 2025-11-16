@@ -4,6 +4,7 @@ import pytest
 
 # 🚨 FORÇAR CONFIGURAÇÃO DO DJANGO ANTES DE TUDO
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = "true"
 
 # Importar e configurar Django imediatamente
 import django

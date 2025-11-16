@@ -28,5 +28,8 @@ pytest-django>=4.5.2
 # --- End to end testing tool ---
 pytest-playwright>=0.6.0
 
+# --- Pytest Environment Variables (for e2e testing with different settings) ---
+pytest-env>=0.7.0
+
 # --- Optional: PDF generation (for export/print views of article pages) ---
 WeasyPrint>=61.0

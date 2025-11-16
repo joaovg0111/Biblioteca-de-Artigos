@@ -15,13 +15,12 @@ RUN groupadd -g ${GID} ${USER} && \
 # Install system-level dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # --- Database ---
-    # For SQLite command-line interface and database support.
     sqlite3 \
     \
     # --- Version Control ---
     git \
     \
-    # --- PDF Export Dependencies (for libraries like WeasyPrint) ---
+    # --- PDF Export Dependencies ---
     libpango-1.0-0 \
     libcairo2 \
     libgdk-pixbuf-2.0-0 \
@@ -29,9 +28,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     shared-mime-info \
     \
     # --- Email System ---
-    # A lightweight SMTP client for sending emails.
     msmtp \
     \
+    # --- Playwright Dependencies (para testes E2E) ---
+    libnspr4 \
+    libnss3 \
+    libdbus-1-3 \
+    libatk1.0-0t64 \
+    libatk-bridge2.0-0t64 \
+    libatspi2.0-0t64 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libxkbcommon0 \
+    libasound2t64 \
+    libcups2t64 \
+    # Limpa o cache do apt
     && rm -rf /var/lib/apt/lists/*
 
 # Switch to the non-root user.
