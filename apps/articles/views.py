@@ -111,7 +111,6 @@ def download_pdf_view(request, article_id):
         raise Http404("Arquivo PDF não encontrado no servidor.")
 
 @login_required
-@login_required
 def my_articles_view(request):
     """
     Exibe uma lista de artigos que o usuário logado enviou,

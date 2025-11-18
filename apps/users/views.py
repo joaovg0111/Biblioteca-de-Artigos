@@ -16,17 +16,12 @@ def signup_view(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Profile.objects.create(
-                user=user,
-                affiliation=request.POST.get('affiliation', ''),
-                interests=request.POST.get('interests', ''),
-                biography=request.POST.get('biography', '')
-            )
-            # ESTA É A CORREÇÃO CRÍTICA:
-            # Especificamos explicitamente qual backend usar para a sessão de login,
-            # resolvendo a ambiguidade para o Django.
-            # Use o backend padrão do Django para garantir a compatibilidade após a criação do usuário.
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend') 
+            # A criação do perfil agora é tratada de forma segura dentro do método save() do SignUpForm.
+            # Após a criação, o usuário já é considerado autenticado.
+            # No entanto, com múltiplos backends de autenticação, o Django precisa saber
+            # qual backend associar à sessão do usuário. Especificar o ModelBackend
+            # padrão garante que a sessão seja criada de forma consistente.
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f"Cadastro realizado com sucesso! Bem-vindo(a), {user.first_name}!")
             return redirect('index')
     else:

@@ -60,8 +60,11 @@ DATABASES = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    'apps.users.backends.EmailBackend',
+    # 1. Tenta o backend padrão do Django primeiro (login com username).
+    # Isso é crucial para o admin e para a compatibilidade geral.
     'django.contrib.auth.backends.ModelBackend',
+    # 2. Se o primeiro falhar, tenta o seu backend customizado (login com e-mail).
+    'apps.users.backends.EmailBackend',
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
