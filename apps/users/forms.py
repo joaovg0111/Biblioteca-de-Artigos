@@ -6,6 +6,7 @@ from django.contrib.auth.password_validation import password_validators_help_tex
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from .models import Profile
+from apps.notifications.models import UserInterest
 
 class SignUpForm(UserCreationForm):
     """
@@ -81,12 +82,20 @@ class SignUpForm(UserCreationForm):
         """
         user = super().save(commit=commit)
         if commit:
+            # Cria o perfil com os dados básicos
             Profile.objects.create(
                 user=user,
                 affiliation=self.cleaned_data.get('affiliation', ''),
-                interests=self.cleaned_data.get('interests', ''),
                 biography=self.cleaned_data.get('biography', '')
             )
+            # Processa os interesses de pesquisa, salvando-os no modelo UserInterest
+            interests_string = self.cleaned_data.get('interests', '')
+            if interests_string:
+                # Divide a string por vírgulas e cria um objeto UserInterest para cada palavra-chave
+                keywords = [keyword.strip().lower() for keyword in interests_string.split(',') if keyword.strip()]
+                for keyword in keywords:
+                    UserInterest.objects.get_or_create(user=user, keyword=keyword)
+
         return user
 
     def clean_first_name(self):

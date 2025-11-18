@@ -8,7 +8,6 @@ class Profile(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     affiliation = models.CharField(max_length=255, blank=True, verbose_name="Afiliação Institucional")
-    interests = models.CharField(max_length=255, blank=True, verbose_name="Interesses de Pesquisa")
     biography = models.TextField(blank=True, verbose_name="Biografia do Perfil")
 
     def __str__(self):
