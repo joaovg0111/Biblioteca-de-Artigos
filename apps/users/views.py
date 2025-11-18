@@ -25,7 +25,8 @@ def signup_view(request):
             # ESTA É A CORREÇÃO CRÍTICA:
             # Especificamos explicitamente qual backend usar para a sessão de login,
             # resolvendo a ambiguidade para o Django.
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            # Use o backend padrão do Django para garantir a compatibilidade após a criação do usuário.
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend') 
             messages.success(request, f"Cadastro realizado com sucesso! Bem-vindo(a), {user.first_name}!")
             return redirect('index')
     else:
@@ -67,5 +68,3 @@ def logout_view(request):
     logout(request)
     messages.info(request, "Você foi desconectado com sucesso.")
     return redirect('index')
-
-

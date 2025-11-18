@@ -29,3 +29,10 @@ def pytest_load_initial_conftests(early_config, parser, args):
     if not settings.configured:
         django.setup()
         print("✅ Django configurado via pytest_load_initial_conftests")
+# Este arquivo é usado para definir fixtures globais para o pytest.
+# Deixe este arquivo vazio por enquanto.
+# O pytest-django cuidará da configuração do Django usando as
+# informações do arquivo pytest.ini.
+#
+# Adicionar chamadas manuais como `django.setup()` aqui causa
+# conflitos e erros como "Conflicting models".

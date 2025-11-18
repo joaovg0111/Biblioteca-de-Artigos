@@ -9,14 +9,13 @@ class SignUpForm(UserCreationForm):
     A form for creating new users. It extends the base UserCreationForm to add
     custom validation and additional fields like first name, last name, and email.
     """
-    first_name = forms.CharField(max_length=150, required=True, label="Nome")
-    last_name = forms.CharField(max_length=150, required=True, label="Sobrenome")
-    email = forms.EmailField(max_length=254, required=True, help_text='Obrigatório.', label="Email")
+    # Os campos personalizados (first_name, etc.) são adicionados através da Meta classe abaixo.
+    # Definir campos aqui pode entrar em conflito com a forma como o UserCreationForm os constrói.
 
     class Meta(UserCreationForm.Meta):
         model = User
-        # Define the fields that will be handled by this form.
-        # UserCreationForm already provides 'username', 'password2', and 'password2'.
+        # UserCreationForm já lida com 'username' e os campos de senha.
+        # Nós apenas adicionamos os campos extras que queremos do modelo User.
         fields = ('username', 'first_name', 'last_name', 'email')
     
     def clean_first_name(self):
@@ -24,16 +23,16 @@ class SignUpForm(UserCreationForm):
         Custom validation to ensure the first name contains only letters.
         """
         first_name = self.cleaned_data.get('first_name')
-        if not re.match(r'^[a-zA-Z\s]+$', first_name):
+        if not re.match(r'^[\w\s]+$', first_name, re.UNICODE):
             raise ValidationError("O nome deve conter apenas letras e espaços.")
         return first_name
 
     def clean_last_name(self):
         """
-        Custom validation to ensure the last name contains only letters.
+        Custom validation to ensure the last name contains only letters and spaces.
         """
         last_name = self.cleaned_data.get('last_name')
-        if not re.match(r'^[a-zA-Z\s]+$', last_name):
+        if not re.match(r'^[\w\s]+$', last_name, re.UNICODE):
             raise ValidationError("O sobrenome deve conter apenas letras e espaços.")
         return last_name
 
@@ -59,4 +58,3 @@ class EmailAuthenticationForm(AuthenticationForm):
         strip=False,
         widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'class': 'mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm'}),
     )
-
